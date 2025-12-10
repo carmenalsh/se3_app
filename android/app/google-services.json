@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "44704147530",
+    "project_id": "software-engineering-pro-717e0",
+    "storage_bucket": "software-engineering-pro-717e0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:44704147530:android:8fe8b5df3deb07e688deb3",
+        "android_client_info": {
+          "package_name": "com.example.se3"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAffLWA5Q2uaLBylk5DK-1TsJ6MuNKC42M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

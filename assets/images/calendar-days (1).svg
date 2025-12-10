@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="34.864" height="37.299" viewBox="0 0 34.864 37.299">
+  <g id="calendar-days" transform="translate(-1.25 0.25)">
+    <path id="Path_1162" data-name="Path 1162" d="M2.25,7.619A4.869,4.869,0,0,1,7.119,2.75H30.246a4.869,4.869,0,0,1,4.869,4.869V11.27H2.25Z" transform="translate(0 2.869)" fill="rgba(247,247,247,0.3)"/>
+    <path id="Path_1163" data-name="Path 1163" d="M5.75,5.619V.75" transform="translate(5.02 0)" fill="none" stroke="#adadad" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+    <path id="Path_1164" data-name="Path 1164" d="M12.25,5.619V.75" transform="translate(14.344 0)" fill="none" stroke="#adadad" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+    <path id="Path_1165" data-name="Path 1165" d="M30.246,2.75H7.119A4.869,4.869,0,0,0,2.25,7.619V28.311A4.869,4.869,0,0,0,7.119,33.18H30.246a4.869,4.869,0,0,0,4.869-4.869V7.619A4.869,4.869,0,0,0,30.246,2.75Z" transform="translate(0 2.869)" fill="none" stroke="#adadad" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+    <path id="Path_1166" data-name="Path 1166" d="M2.25,6.25H35.114" transform="translate(0 7.889)" fill="none" stroke="#adadad" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+    <path id="Path_1167" data-name="Path 1167" d="M10.434,8.25a2.434,2.434,0,1,0,2.434,2.434A2.438,2.438,0,0,0,10.434,8.25Z" transform="translate(8.248 10.758)" fill="#319e74"/>
+    <path id="Path_1168" data-name="Path 1168" d="M13.934,13.119A2.434,2.434,0,1,0,11.5,10.684,2.438,2.438,0,0,0,13.934,13.119Z" transform="translate(13.268 10.758)" fill="#319e74"/>
+    <path id="Path_1169" data-name="Path 1169" d="M10.434,11.25a2.434,2.434,0,1,0,2.434,2.434A2.438,2.438,0,0,0,10.434,11.25Z" transform="translate(8.248 15.061)" fill="#319e74"/>
+    <path id="Path_1170" data-name="Path 1170" d="M6.934,11.25a2.434,2.434,0,1,0,2.434,2.434A2.438,2.438,0,0,0,6.934,11.25Z" transform="translate(3.227 15.061)" fill="#319e74"/>
+    <path id="Path_1171" data-name="Path 1171" d="M13.934,11.25a2.434,2.434,0,1,0,2.434,2.434A2.438,2.438,0,0,0,13.934,11.25Z" transform="translate(13.268 15.061)" fill="#319e74"/>
+  </g>
+</svg>
