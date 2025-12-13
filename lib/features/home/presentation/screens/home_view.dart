@@ -1,18 +1,10 @@
-import 'package:complaints_app/core/common%20widget/custom_button_widget.dart';
 import 'package:complaints_app/core/common%20widget/custom_text_widget.dart';
 import 'package:complaints_app/core/config/route_name.dart';
 import 'package:complaints_app/core/theme/color/app_color.dart';
-import 'package:complaints_app/core/utils/custom_snackbar_validation.dart';
 import 'package:complaints_app/core/utils/media_query_config.dart';
-import 'package:complaints_app/features/auth/presentation/manager/logout_cubit/logout_cubit.dart';
-import 'package:complaints_app/features/home/presentation/manager/home_cubit/home_cubit.dart';
-import 'package:complaints_app/features/home/presentation/widgets/card_details_widget.dart';
-import 'package:complaints_app/features/home/presentation/widgets/complaint_Card_widget.dart';
-import 'package:complaints_app/features/home/presentation/widgets/complaint_card_shimmer_widget.dart';
-import 'package:complaints_app/features/home/presentation/widgets/show_notification_bottom_sheet.dart';
+import 'package:complaints_app/core/common%20widget/card_details_widget.dart';
 import 'package:complaints_app/features/home/presentation/widgets/top_part_home.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeView extends StatelessWidget {
@@ -58,10 +50,11 @@ class HomeViewBody extends StatelessWidget {
           onTapServices: () {
             // debugPrint("loggg outtttt");
             // context.read<LogoutCubit>().logOutSubmitted();
-             context.pushNamed(AppRouteRName.showServices);
+            context.pushNamed(AppRouteRName.showServices);
           },
 
-          onTapNotification: () {
+          onTapAccountsManag: () {
+            context.pushNamed(AppRouteRName.accountManag);
             // final dummyNotifications = <NotificationItem>[
             //   const NotificationItem(
             //     title: 'تم تسجيل شكوى جديدة',
@@ -112,7 +105,7 @@ class HomeViewBody extends StatelessWidget {
         SizedBox(height: SizeConfig.height * .01),
         Expanded(
           child: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             children: [
               GestureDetector(
                 onTap:
@@ -139,6 +132,7 @@ class HomeViewBody extends StatelessWidget {
                 //   description: complaint.description,
                 // ),
                 child: CardDetaisWidget(
+                  onTapEditAccount: () {},
                   title: 'مشتريات منزل',
                   status: 'سحب',
                   numberAccount: '129002',
@@ -155,10 +149,10 @@ class HomeViewBody extends StatelessWidget {
               // ;
               //   },
               // ),
-              SizedBox(height: 16),
               GestureDetector(
                 onTap: () {},
                 child: CardDetaisWidget(
+                  onTapEditAccount: () {},
                   title: 'مشتريات منزل',
                   status: 'تحويل',
                   //titleDescreption: 'رقم الحساب',
@@ -172,10 +166,11 @@ class HomeViewBody extends StatelessWidget {
                   date: '12/04/2025',
                 ),
               ),
-              SizedBox(height: 16),
+
               GestureDetector(
                 onTap: () {},
                 child: CardDetaisWidget(
+                  onTapEditAccount: () {},
                   title: 'مشتريات منزل',
                   status: 'ايداع',
                   //titleDescreption: 'رقم الحساب',

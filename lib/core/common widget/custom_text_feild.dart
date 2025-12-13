@@ -76,7 +76,7 @@ class CustomTextField extends StatelessWidget {
                 ),
           suffixIconColor: Color(0xffACACAC),
           filled: true,
-          fillColor: AppColor.textFieldColor,
+          fillColor: AppColor.grey,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(borderRadius),

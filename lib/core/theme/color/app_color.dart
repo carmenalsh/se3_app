@@ -9,6 +9,8 @@ class AppColor {
   static const textFieldColor = Color(0xffF1F1F1);
 
   static const grey = Color(0xffF1F1F1);
+  static const lightgrey = Color(0xffE3E3E3);
+
   static const darkGrey = Color(0xff424242);
   static const middleGrey = Color(0xff8D8D8D);
   static const greyText = Color(0xff828282);

@@ -2,6 +2,7 @@ import 'package:complaints_app/core/config/route_name.dart';
 import 'package:complaints_app/core/databases/api/dio_consumer.dart';
 import 'package:complaints_app/core/databases/api/end_points.dart';
 import 'package:complaints_app/core/network/network_info.dart';
+import 'package:complaints_app/features/account_manag/presentation/view/account_manag_page.dart';
 import 'package:complaints_app/features/app_services/presentation/view/app_services_page.dart';
 import 'package:complaints_app/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:complaints_app/features/auth/data/repositories/auth_repository_impl.dart';
@@ -24,6 +25,8 @@ import 'package:complaints_app/features/auth/presentation/view/forgot_password_o
 import 'package:complaints_app/features/auth/presentation/view/login_view.dart';
 import 'package:complaints_app/features/auth/presentation/view/register_view.dart';
 import 'package:complaints_app/features/auth/presentation/view/verify_register_view.dart';
+import 'package:complaints_app/features/create_account/presentation/manager/create_account_cubit.dart';
+import 'package:complaints_app/features/create_account/presentation/view/create_account_page.dart';
 import 'package:complaints_app/features/home/data/data_sources/home_remote_data_source.dart';
 import 'package:complaints_app/features/home/data/repository_impl/home_repository_impl.dart';
 import 'package:complaints_app/features/home/domain/use_cases/get_complaints_use_case.dart';
@@ -337,6 +340,21 @@ abstract class AppRourer {
         path: '/showServices',
         name: AppRouteRName.showServices,
         builder: (context, state) => const AppServicesPage(),
+      ),
+      GoRoute(
+        path: '/complaintDetailsView',
+        name: AppRouteRName.accountManag,
+        builder: (context, state) => const AccountManagPage(),
+      ),
+      GoRoute(
+        path: '/createAccount',
+        name: AppRouteRName.createAccount,
+        builder: (context, state) {
+          return BlocProvider<CreateAccountCubit>(
+            create: (_) => CreateAccountCubit(),
+            child:  CreateAccountPage(),
+          );
+        },
       ),
     ],
   );

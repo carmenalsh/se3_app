@@ -2,6 +2,7 @@ enum OperationType {
   withdraw, // سحب
   deposit, // إيداع
   transfer, // تحويل
+  editAccount,
 }
 
 class OperationConfig {
@@ -10,6 +11,9 @@ class OperationConfig {
   final bool showToAccount;
   final bool showAmount;
   final bool operayionAddress;
+  final bool showAccountName;
+  final bool showAccountState;
+  final bool showAccountDescription;
 
   const OperationConfig({
     required this.title,
@@ -17,6 +21,9 @@ class OperationConfig {
     this.showToAccount = false,
     this.showAmount = false,
     this.operayionAddress = false,
+    this.showAccountDescription = false,
+    this.showAccountName = false,
+    this.showAccountState = false,
   });
 }
 
@@ -40,4 +47,10 @@ const operationConfigs = {
     operayionAddress: true,
     showAmount: true,
   ),
+  OperationType.editAccount:OperationConfig(
+    title: 'تعديل الحساب',
+    showAccountName: true,
+    showAccountState: true,
+    showAccountDescription: true,
+    )
 };

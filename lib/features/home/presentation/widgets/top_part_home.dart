@@ -15,14 +15,14 @@ class TopPartHome extends StatelessWidget {
     super.key,
     required this.onChangedSearch,
     required this.onTapServices,
-    required this.onTapNotification,
+    required this.onTapAccountsManag,
     required this.onSearchTap,
     required this.onTapCancel,
   });
 
   final void Function(String) onChangedSearch;
   final void Function() onTapServices;
-  final void Function() onTapNotification;
+  final void Function() onTapAccountsManag;
   final void Function(String) onSearchTap;
   final void Function() onTapCancel;
 
@@ -126,20 +126,7 @@ class TopPartHome extends StatelessWidget {
                   childHorizontalPad: SizeConfig.width * .005,
                   //childVerticalPad: SizeConfig.height * .002,
                   backgroundColor: AppColor.darkGrey,
-                  onTap:
-                      ()
-                      //async
-                      {
-                        // FocusManager.instance.primaryFocus?.unfocus();
-
-                        // final result = await context.pushNamed<bool>(
-                        //   AppRouteRName.submitComplaintView,
-                        // );
-
-                        // if (result == true) {
-                        //   context.read<HomeCubit>().loadComplaints();
-                        // }
-                      },
+                  onTap:onTapAccountsManag,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 5),
                     child: Row(

@@ -9,5 +9,9 @@ abstract class AppRouteRName {
 
   static final homeView = "homeView";
   static final showServices = "showServices";
+  static final accountManag = "accountManag";
+  static final createAccount = "createAccount";
+
+
   static final complaintDetailsView = "complaintDetailsView";
 }
