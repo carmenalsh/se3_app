@@ -1,6 +1,6 @@
 class EndPoints {
   /// عدّل الـ baseUrl حسب الـ API تبعك
-  static const String baseUrl = 'http://192.168.177.187/api/v1/';
+  static const String baseUrl = 'http://192.168.155.187/api/v1/';
   static const String refreshToken = 'http://localhost/api/refresh';
 
 
@@ -17,12 +17,21 @@ class EndPoints {
   static const String logout = 'citizen/logout';
 
   // home
+    static const String getTransactions = 'citizen/home/transactionHistory';
     static const String showComplaints = 'citizen/home/showComplaints';
     static const String searchComplaint = 'citizen/home/searchComplaint';
     static const String getNotifications = '/citizen/notification';
+// account manag
+  static const String agency = 'citizen/home/agencyByName';
+  static const String updateAccount = 'citizen/Account/update';
+// create account
+  static const String createAccount = 'citizen/Account/create';
+  // app services
+  static const String accountsForSelect = 'citizen/Account/forSelect';
+
 
   // submit a complaint
-  static const String agency = 'citizen/home/agencyByName';
+  static const String getAccounts = 'citizen/Account/index';
   static const String complaintType = 'citizen/home/ComplaintTypeByName';
   static const String createComplaint = 'citizen/home/createComplain';
   // complaint details

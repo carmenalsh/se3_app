@@ -13,116 +13,133 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CreateAccountPage extends StatelessWidget {
   CreateAccountPage({super.key});
-  String? selectedAccount;
 
-  final accounts = const [
-    "حساب جاري - 1234",
-    "حساب توفير - 5678",
-    "حساب استثمار - 9999",
-  ];
+  final accounts = const ["جاري", "توفير", "قرض", "استثماري"];
+
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CreateAccountCubit, CreateAccountState>(
-      builder: (context, state) {
-        final cubit = context.read<CreateAccountCubit>();
+    return BlocListener<CreateAccountCubit, CreateAccountState>(
+      listenWhen: (p, c) => p.message != c.message && c.message != null,
+      listener: (context, state) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(state.message!)));
 
-        return Scaffold(
-          body: Column(
-            children: [
-              CustomAppBar(title: "انشاء حساب"),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 4,
-                        ),
-                        child: AuthFieldLabel(
-                          label: "اسم الحساب",
-                          hint: "ادخل اسم الحساب الخاص بك...",
-                          suffixIcon: Icons.edit_document,
-                          keyboardType: TextInputType.text,
-                          onChanged: (value) {
-                            // context.read<SubmitComplaintCubit>().titleChanged(value);
-                          },
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 4,
-                        ),
-                        child: AccountsDropdownField(
-                          label: "نوع الحساب",
-                          hint: "اختار نوع الحساب...",
-                          hintFontSize: 14,
-                          selectedValue: state.selectedAccount,
-                          items: state.accounts,
-                          onChanged: cubit.accountChanged,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 4,
-                        ),
-                        child: CustomDescriptionTextFiels(
-                          label: "وصف الحساب",
-                          controller: cubit.descriptionController,
-                          maxLines: 3,
-                          maxLength: 512,
-                          suffixIcon: Icons.layers_outlined,
-                          keyboardType: TextInputType.multiline,
-                          onChanged: cubit.descriptionChanged,
-                          hint: "ادخل وصفا للحساب الخاص بك...",
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 4,
-                        ),
-                        child: AuthFieldLabel(
-                          label: "المبلغ",
-                          hint: "ادخل مبلغا تريد ايداعه في الحساب...",
-                          suffixIcon: Icons.credit_card,
-                          keyboardType: TextInputType.text,
-                          onChanged: (value) {
-                            // context.read<SubmitComplaintCubit>().titleChanged(value);
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: CustomButtonWidget(
-                  width: double.infinity,
-                  backgroundColor: AppColor.primary,
-                  childHorizontalPad: SizeConfig.width * .07,
-                  childVerticalPad: SizeConfig.height * .011,
-                  borderRadius: 10,
-                  onTap: () {
-                    // if (_formKey.currentState?.validate() ?? false) {
-                    //   debugPrint("im at confirm log innnnnn");
-                    //   context.read<LoginCubit>().loginSubmitted();
-                    // }
-                  },
-                  child: CustomTextWidget(
-                    "تأكيد الارسال",
-                    fontSize: SizeConfig.height * .025,
-                    color: AppColor.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
+        if (state.status == CreateAccountStatus.success) {
+          Navigator.pop(context, true);
+        }
       },
+      child: BlocBuilder<CreateAccountCubit, CreateAccountState>(
+        builder: (context, state) {
+          final cubit = context.read<CreateAccountCubit>();
+
+          return Scaffold(
+            body: Column(
+              children: [
+                CustomAppBar(title: "انشاء حساب"),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 4,
+                          ),
+                          child: AuthFieldLabel(
+                            controller: cubit.accountNameController,
+                            label: "اسم الحساب",
+                            hint: "ادخل اسم الحساب الخاص بك...",
+                            suffixIcon: Icons.edit_document,
+                            keyboardType: TextInputType.text,
+                            onChanged: cubit.accountNameChanged,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 4,
+                          ),
+                          child: AccountsDropdownField(
+                            label: "نوع الحساب",
+                            hint: "اختار نوع الحساب...",
+                            hintFontSize: 16,
+                            hintColor: AppColor.middleGrey,
+                            selectedValue: state.selectedTypeAccount,
+                            items: accounts,
+                            onChanged: cubit.accountChanged,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 4,
+                          ),
+                          child: CustomDescriptionTextFiels(
+                            label: "وصف الحساب",
+                            controller: cubit.descriptionController,
+                            maxLines: 3,
+                            maxLength: 512,
+                            suffixIcon: Icons.layers_outlined,
+                            keyboardType: TextInputType.multiline,
+                            onChanged: cubit.descriptionChanged,
+                            hint: "ادخل وصفا للحساب الخاص بك...",
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 4,
+                          ),
+                          child: AuthFieldLabel(
+                            controller: cubit.amountController,
+                            label: "المبلغ",
+                            hint: "ادخل مبلغا تريد ايداعه في الحساب...",
+                            suffixIcon: Icons.credit_card,
+                            keyboardType: TextInputType.number,
+                            onChanged: cubit.amountChanged,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                /// زر الإرسال
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: CustomButtonWidget(
+                    width: double.infinity,
+                    backgroundColor: AppColor.primary,
+                    childHorizontalPad: SizeConfig.width * .07,
+                    childVerticalPad: SizeConfig.height * .011,
+                    borderRadius: 10,
+                    onTap: () {
+                      if (state.isSubmitting) return;
+                      cubit.submitCreateAccount();
+                    },
+
+                    child: state.isSubmitting
+                        ? const SizedBox(
+                            height: 22,
+                            width: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : CustomTextWidget(
+                            "تأكيد الارسال",
+                            fontSize: SizeConfig.height * .025,
+                            color: AppColor.white,
+                          ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }

@@ -1,14 +1,62 @@
 import 'package:complaints_app/core/common%20widget/custom_app_bar.dart';
+import 'package:complaints_app/core/common%20widget/operation_bottom_sheet.dart';
 import 'package:complaints_app/core/enums/operation_type.dart';
 import 'package:complaints_app/core/theme/assets/images.dart';
 import 'package:complaints_app/core/theme/color/app_color.dart';
+import 'package:complaints_app/features/app_services/presentation/manager/app_services_cubit.dart';
+import 'package:complaints_app/features/app_services/presentation/manager/app_services_state.dart';
 import 'package:complaints_app/features/app_services/presentation/widget/divider_widget.dart';
-import 'package:complaints_app/features/app_services/presentation/widget/operation_bottom_sheet.dart';
 import 'package:complaints_app/features/app_services/presentation/widget/services_types.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AppServicesPage extends StatelessWidget {
   const AppServicesPage({super.key});
+
+  Future<void> _openOperationWithAccounts(
+    BuildContext context, {
+    required OperationType type,
+  }) async {
+    final cubit = context.read<AppServicesCubit>();
+    await cubit.loadAccountsForSelect();
+
+    final state = cubit.state;
+
+    if (state.status == AppServicesStatus.error && state.message != null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(state.message!)));
+      return;
+    }
+
+    final accounts = state.accountsForSelect;
+    if (accounts.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No accounts available right now')),
+      );
+      return;
+    }
+
+    final names = accounts.map((e) => e.name).toList();
+    final map = {for (final a in accounts) a.name: a.id};
+
+    final config = operationConfigs[type]!;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => OperationBottomSheet(
+        config: config,
+        dropdownItems: names,
+        nameToId: map,
+        isSubmitting: state.isSubmitting,
+        onFromAccountIdChanged: cubit.fromAccountIdChanged,
+        onSubmit: () {
+          // TODO: connect submit action for this operation
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,40 +76,28 @@ class AppServicesPage extends StatelessWidget {
                         // mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           InkWell(
-                            onTap: () {
-                              final config =
-                                  operationConfigs[OperationType.withdraw]!;
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                builder: (_) =>
-                                    OperationBottomSheet(config: config),
-                              );
-                            },
+                            onTap: () => _openOperationWithAccounts(
+                              context,
+                              type: OperationType.withdraw,
+                            ),
                             child: ComplaintInformationWidget(
                               titleColor: AppColor.black,
                               image: AppImage.withdraw,
-                              title: 'سحب',
+                              title: "سحب",
                             ),
                           ),
                           SizedBox(width: 25),
                           DividerWidget(),
                           SizedBox(width: 25),
                           InkWell(
-                            onTap: () {
-                              final config =
-                                  operationConfigs[OperationType.deposit]!;
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                builder: (_) =>
-                                    OperationBottomSheet(config: config),
-                              );
-                            },
+                            onTap: () => _openOperationWithAccounts(
+                              context,
+                              type: OperationType.deposit,
+                            ),
                             child: ComplaintInformationWidget(
                               titleColor: AppColor.black,
                               image: AppImage.desposit,
-                              title: 'ايداع',
+                              title: "ايداع",
                             ),
                           ),
                           SizedBox(width: 25),
@@ -74,14 +110,17 @@ class AppServicesPage extends StatelessWidget {
                               showModalBottomSheet(
                                 context: context,
                                 isScrollControlled: true,
-                                builder: (_) =>
-                                    OperationBottomSheet(config: config),
+                                builder: (_) => OperationBottomSheet(
+                                  config: config,
+                                  isSubmitting: false,
+                                  onSubmit: () {},
+                                ),
                               );
                             },
                             child: ComplaintInformationWidget(
                               titleColor: AppColor.black,
                               image: AppImage.transformation,
-                              title: 'تحويل',
+                              title: "تحويل",
                             ),
                           ),
                         ],
@@ -97,7 +136,7 @@ class AppServicesPage extends StatelessWidget {
                         ComplaintInformationWidget(
                           titleColor: AppColor.black,
                           image: AppImage.generateFile,
-                          title: 'توليد ملف',
+                          title: "توليد ملف",
                         ),
                         SizedBox(width: 16),
                         DividerWidget(),
@@ -105,7 +144,7 @@ class AppServicesPage extends StatelessWidget {
                         ComplaintInformationWidget(
                           titleColor: AppColor.black,
                           image: AppImage.notification,
-                          title: 'اشعارات',
+                          title: "اشعارات",
                         ),
                         SizedBox(width: 24),
                         DividerWidget(),
@@ -113,7 +152,7 @@ class AppServicesPage extends StatelessWidget {
                         ComplaintInformationWidget(
                           titleColor: AppColor.black,
                           image: AppImage.logout,
-                          title: 'تسجيل خروج',
+                          title: "تسجيل خروج",
                         ),
                       ],
                     ),
@@ -127,7 +166,7 @@ class AppServicesPage extends StatelessWidget {
                         ComplaintInformationWidget(
                           titleColor: AppColor.black,
                           image: AppImage.scheduling,
-                          title: 'جدولة',
+                          title: "جدولة",
                         ),
                         SizedBox(width: 36),
                         DividerWidget(),

@@ -78,7 +78,7 @@ class CardDetaisWidget extends StatelessWidget {
                       children: [
                         if (editIcon != null) ...[
                           InkWell(
-                            onTap:onTapEditAccount,
+                            onTap: onTapEditAccount,
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 8,
@@ -157,7 +157,6 @@ class CardDetaisWidget extends StatelessWidget {
                                 amount,
                                 fontSize: SizeConfig.diagonal * .016,
                                 color: AppColor.textInCard,
-
                                 overflow: TextOverflow.visible,
                                 textAlign: TextAlign.start,
                               ),

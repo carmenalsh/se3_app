@@ -8,14 +8,12 @@ class AccountsDropdownField extends StatelessWidget {
   final String hint;
   final String label;
   final double hintFontSize;
+  final Color hintColor;
 
-  /// القيمة المختارة (ممكن null)
   final String? selectedValue;
 
-  /// عناصر ستاتيك حالياً
   final List<String> items;
 
-  /// ترجع القيمة المختارة للواجهة (الواجهة بتقرر شو تعمل: Cubit / setState)
   final ValueChanged<String?> onChanged;
 
   const AccountsDropdownField({
@@ -26,15 +24,11 @@ class AccountsDropdownField extends StatelessWidget {
     required this.selectedValue,
     required this.items,
     required this.onChanged,
+    required this.hintColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    // ✅ مهم: إذا selectedValue مو موجودة ضمن items لازم تكون null
-    final safeValue = (selectedValue != null && items.contains(selectedValue))
-        ? selectedValue
-        : null;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -47,7 +41,7 @@ class AccountsDropdownField extends StatelessWidget {
         const SizedBox(height: 6),
 
         DropdownButtonFormField<String>(
-          value: safeValue,
+          // value: safeValue,
           icon: const Icon(Icons.keyboard_arrow_down, color: Color(0xffACACAC)),
 
           // خلي الستايل تبعك كما هو (استبدل هاد بالستايل الموجود عندك)
@@ -61,6 +55,7 @@ class AccountsDropdownField extends StatelessWidget {
             filled: true,
             fillColor: AppColor.grey,
             hintText: hint,
+
             hintStyle: TextStyle(
               color: AppColor.middleGrey,
               fontFamily: AppFonts.tasees,
@@ -89,6 +84,7 @@ class AccountsDropdownField extends StatelessWidget {
                   value: acc,
                   child: Text(
                     acc,
+                    style: TextStyle(color: AppColor.middleGrey),
                     textDirection: TextDirection.rtl,
                     overflow: TextOverflow.ellipsis,
                   ),

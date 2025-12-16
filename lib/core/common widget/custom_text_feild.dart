@@ -48,6 +48,11 @@ class CustomTextField extends StatelessWidget {
         keyboardType: keyboardType,
         obscureText: obscureText,
         enabled: enabled,
+         style: TextStyle(
+    fontFamily: AppFonts.tasees, // أو اسم الخط عندك
+    fontSize: 16,
+    color: AppColor.middleGrey, // حسب تصميمك
+  ),
         maxLines: obscureText ? 1 : maxLines,
         onChanged: onChanged,
         validator: validator,

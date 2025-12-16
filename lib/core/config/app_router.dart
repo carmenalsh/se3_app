@@ -2,7 +2,16 @@ import 'package:complaints_app/core/config/route_name.dart';
 import 'package:complaints_app/core/databases/api/dio_consumer.dart';
 import 'package:complaints_app/core/databases/api/end_points.dart';
 import 'package:complaints_app/core/network/network_info.dart';
+import 'package:complaints_app/features/account_manag/data/data_source/account_mange_remote_data_source.dart';
+import 'package:complaints_app/features/account_manag/data/repository_impl/account_manag_repository_impl.dart';
+import 'package:complaints_app/features/account_manag/domain/use_case/get_accounts_use_case.dart';
+import 'package:complaints_app/features/account_manag/domain/use_case/update_account_use_case.dart';
+import 'package:complaints_app/features/account_manag/presentation/manager/account_manag_cubit.dart';
 import 'package:complaints_app/features/account_manag/presentation/view/account_manag_page.dart';
+import 'package:complaints_app/features/app_services/data/data_source/app_services_remote_data_source.dart';
+import 'package:complaints_app/features/app_services/data/repository_impl/app_services_repository_impl.dart';
+import 'package:complaints_app/features/app_services/domain/use_case/get_accounts_for_select_use_case.dart';
+import 'package:complaints_app/features/app_services/presentation/manager/app_services_cubit.dart';
 import 'package:complaints_app/features/app_services/presentation/view/app_services_page.dart';
 import 'package:complaints_app/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:complaints_app/features/auth/data/repositories/auth_repository_impl.dart';
@@ -25,11 +34,14 @@ import 'package:complaints_app/features/auth/presentation/view/forgot_password_o
 import 'package:complaints_app/features/auth/presentation/view/login_view.dart';
 import 'package:complaints_app/features/auth/presentation/view/register_view.dart';
 import 'package:complaints_app/features/auth/presentation/view/verify_register_view.dart';
+import 'package:complaints_app/features/create_account/data/data_source/create_account_remote_data_source.dart';
+import 'package:complaints_app/features/create_account/data/repository_impl/create_account_repository_impl.dart';
+import 'package:complaints_app/features/create_account/domain/use_case/create_account_use_case.dart';
 import 'package:complaints_app/features/create_account/presentation/manager/create_account_cubit.dart';
 import 'package:complaints_app/features/create_account/presentation/view/create_account_page.dart';
 import 'package:complaints_app/features/home/data/data_sources/home_remote_data_source.dart';
 import 'package:complaints_app/features/home/data/repository_impl/home_repository_impl.dart';
-import 'package:complaints_app/features/home/domain/use_cases/get_complaints_use_case.dart';
+import 'package:complaints_app/features/home/domain/use_cases/get_transaction_use_case.dart';
 import 'package:complaints_app/features/home/domain/use_cases/get_notifications_use_case.dart';
 import 'package:complaints_app/features/home/domain/use_cases/search_complaint_use_case.dart';
 import 'package:complaints_app/features/home/presentation/manager/home_cubit/home_cubit.dart';
@@ -297,13 +309,13 @@ abstract class AppRourer {
           final homeRemoteDataSource = HomeRemoteDataSourceImpl(apiConsumer);
           final homeRepository = HomeRepositoryImpl(homeRemoteDataSource);
 
-          final getComplaintsUseCase = GetComplaintsUseCase(
+          final getTransActionUseCase = GetTransActionUseCase(
             repository: homeRepository,
           );
 
-          final searchComplaintUseCase = SearchComplaintUseCase(
-            repository: homeRepository,
-          );
+          // final searchComplaintUseCase = SearchComplaintUseCase(
+          //   repository: homeRepository,
+          // );
 
           final authRemoreDataSourcev = AuthRemoteDataSourceImpl(
             apiConsumer: apiConsumer,
@@ -314,45 +326,115 @@ abstract class AppRourer {
           );
           final logoutUseCase = LogoutUseCase(repository: authRepository);
 
-          final notificationUseCase = GetNotificationsUseCase(
-            repository: homeRepository,
-          );
+          // final notificationUseCase = GetNotificationsUseCase(
+          //   repository: homeRepository,
+          // );
 
           return MultiBlocProvider(
             providers: [
-              BlocProvider(
-                create: (_) => HomeCubit(
-                  getComplaintsUseCase,
-                  searchComplaintUseCase,
-                  notificationUseCase,
-                ),
-              ),
+              BlocProvider(create: (_) => HomeCubit(getTransActionUseCase)),
 
-              BlocProvider(
-                create: (_) => LogoutCubit(logoutUseCase: logoutUseCase),
-              ),
+              // BlocProvider(
+              //   create: (_) => LogoutCubit(logoutUseCase: logoutUseCase),
+              // ),
             ],
             child: const HomeView(),
           );
         },
       ),
       GoRoute(
+        path: '/accountManag',
+        name: AppRouteRName.accountManag,
+        builder: (context, state) {
+          final dio = Dio(
+            BaseOptions(
+              baseUrl: EndPoints.baseUrl,
+              receiveDataWhenStatusError: true,
+            ),
+          );
+          final api = DioConsumer(dio: dio);
+          final remoteDataSource = AccountRemoteDataSourceImpl(
+            apiConsumer: api,
+          );
+          final repository = AccountManagRepositoryImpl(
+            remoteDataSource: remoteDataSource,
+          );
+          final getAccounts = GetAccountsUseCase(repository: repository);
+          final editAccount = UpdateAccountUseCase(repository: repository);
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider<AccountManagCubit>(
+                create: (context) => AccountManagCubit(
+                  getAccountsUseCase: getAccounts,
+                  updateAccountUseCase: editAccount,
+                )..getAccounts(),
+              ),
+
+              // إذا عندك Cubits ثانية للصفحة ضيفها هون
+              // BlocProvider<SomethingCubit>(
+              //   create: (context) => sl<SomethingCubit>(),
+              // ),
+            ],
+            child: const AccountManagPage(),
+          );
+        },
+      ),
+
+      GoRoute(
         path: '/showServices',
         name: AppRouteRName.showServices,
-        builder: (context, state) => const AppServicesPage(),
+        builder: (context, state) {
+          final dio = Dio(
+            BaseOptions(
+              baseUrl: EndPoints.baseUrl,
+              receiveDataWhenStatusError: true,
+            ),
+          );
+          final api = DioConsumer(dio: dio);
+          final remoteDataSource = AppServicesRemoteDataSourceImpl(
+            apiConsumer: api,
+          );
+          final repository = AppServicesRepositoryImpl(
+            remoteDataSource: remoteDataSource,
+          );
+          final getAccounts = GetAccountsForSelectUseCase(
+            repository: repository,
+          );
+         return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (_) =>
+                    AppServicesCubit(getAccountsForSelectUseCase: getAccounts),
+                child: const AppServicesPage(),
+              ),
+            ],
+            child: const AppServicesPage(),
+          );
+        },
       ),
-      GoRoute(
-        path: '/complaintDetailsView',
-        name: AppRouteRName.accountManag,
-        builder: (context, state) => const AccountManagPage(),
-      ),
+
       GoRoute(
         path: '/createAccount',
         name: AppRouteRName.createAccount,
         builder: (context, state) {
+          final dio = Dio(
+            BaseOptions(
+              baseUrl: EndPoints.baseUrl,
+              receiveDataWhenStatusError: true,
+            ),
+          );
+          final api = DioConsumer(dio: dio);
+          final remoteDataSource = CreateAccountRemoteDataSourceImpl(
+            apiConsumer: api,
+          );
+          final repository = CreateAccountRepositoryImpl(
+            remoteDataSource: remoteDataSource,
+          );
+          final createAccount = CreateAccountUseCase(repository: repository);
           return BlocProvider<CreateAccountCubit>(
-            create: (_) => CreateAccountCubit(),
-            child:  CreateAccountPage(),
+            create: (_) =>
+                CreateAccountCubit(createAccountUseCase: createAccount),
+            child: CreateAccountPage(),
           );
         },
       ),

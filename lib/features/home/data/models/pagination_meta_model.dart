@@ -1,4 +1,4 @@
-import '../../domain/entities/pagination_meta_entity.dart';
+import 'package:complaints_app/features/home/domain/entities/pagination_meta_entity.dart';
 
 class PaginationMetaModel {
   final int currentPage;
@@ -15,19 +15,24 @@ class PaginationMetaModel {
 
   factory PaginationMetaModel.fromJson(Map<String, dynamic> json) {
     return PaginationMetaModel(
-      currentPage: json['current_page'] as int,
-      perPage: json['per_page'] as int,
-      total: json['total'] as int,
-      lastPage: json['last_page'] as int,
+      currentPage: (json['current_page'] as num).toInt(),
+      perPage: (json['per_page'] as num).toInt(),
+      total: (json['total'] as num).toInt(),
+      lastPage: (json['last_page'] as num).toInt(),
     );
   }
 
-  PaginationMetaEntity toEntity() {
-    return PaginationMetaEntity(
-      currentPage: currentPage,
-      perPage: perPage,
-      total: total,
-      lastPage: lastPage,
-    );
-  }
+  Map<String, dynamic> toJson() => {
+        'current_page': currentPage,
+        'per_page': perPage,
+        'total': total,
+        'last_page': lastPage,
+      };
+
+  PaginationMetaEntity toEntity() => PaginationMetaEntity(
+        currentPage: currentPage,
+        perPage: perPage,
+        total: total,
+        lastPage: lastPage,
+      );
 }

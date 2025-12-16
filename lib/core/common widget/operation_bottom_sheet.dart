@@ -2,7 +2,6 @@ import 'package:complaints_app/core/common%20widget/account_picker_field.dart';
 import 'package:complaints_app/core/common%20widget/custom_button_widget.dart';
 import 'package:complaints_app/core/common%20widget/custom_text_widget.dart';
 import 'package:complaints_app/core/enums/operation_type.dart';
-import 'package:complaints_app/core/models/account_item.dart';
 import 'package:complaints_app/core/theme/color/app_color.dart';
 import 'package:complaints_app/core/utils/media_query_config.dart';
 import 'package:complaints_app/features/auth/presentation/widget/auth_field_label.dart';
@@ -11,28 +10,81 @@ import 'package:flutter/material.dart';
 class OperationBottomSheet extends StatefulWidget {
   final OperationConfig config;
 
-  OperationBottomSheet({super.key, required this.config});
+  final bool isSubmitting;
+  final VoidCallback onSubmit;
+
+  final String? initialAccountName;
+  final String? initialStatus;
+  final String? initialDescription;
+  final ValueChanged<String?>? onDropdownChanged;
+  final ValueChanged<String>? onNameChanged;
+  final ValueChanged<String>? onDescriptionChanged;
+  final List<String> dropdownItems;
+
+  final Map<String, int> nameToId;
+  final ValueChanged<int?>? onFromAccountIdChanged;
+
+  OperationBottomSheet({
+    super.key,
+    required this.config,
+    this.dropdownItems = const [],
+    this.onNameChanged,
+    this.onDescriptionChanged,
+    required this.isSubmitting,
+    required this.onSubmit,
+    this.initialAccountName,
+    this.initialStatus,
+    this.initialDescription,
+    this.onDropdownChanged,
+    this.nameToId = const {},
+    this.onFromAccountIdChanged,
+  });
 
   @override
   State<OperationBottomSheet> createState() => _OperationBottomSheetState();
 }
 
 class _OperationBottomSheetState extends State<OperationBottomSheet> {
-  String? selectedAccount;
+  String? selectedStatus;
+  String? selectedFromAccountName;
+  int? selectedFromAccountId;
 
-  final accounts = const [
-    "حساب جاري - 1234",
-    "حساب توفير - 5678",
-    "حساب استثمار - 9999",
-  ];
+  late final TextEditingController nameController;
+  late final TextEditingController descController;
+
   // AccountItem? selected;
+  @override
+  void initState() {
+    super.initState();
+    selectedStatus = widget.initialStatus;
+
+    nameController = TextEditingController(
+      text: widget.initialAccountName ?? '',
+    );
+    descController = TextEditingController(
+      text: widget.initialDescription ?? '',
+    );
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    descController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final items = widget.dropdownItems;
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.only(
+          left: 16,
+          right: 16,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+          top: 8,
+        ),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -86,12 +138,22 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: AccountsDropdownField(
-                    label:  "الحساب",
+                    label: "الحساب",
                     hint: "اختر الحساب الذي تريد السحب منه...",
-                    hintFontSize: 14,
-                    selectedValue: selectedAccount,
-                    items: accounts,
-                    onChanged: (val) => setState(() => selectedAccount = val),
+                    hintFontSize: 16,
+                    hintColor: AppColor.middleGrey,
+                    selectedValue: selectedFromAccountName,
+                    items: items, // items = widget.dropdownItems (أسماء فقط)
+                    onChanged: (val) {
+                      setState(() => selectedFromAccountName = val);
+
+                      final id = (val == null) ? null : widget.nameToId[val];
+                      selectedFromAccountId = id;
+                      widget.onFromAccountIdChanged?.call(id);
+                    },
+                    // selectedValue: selectedStatus,
+                    // items: items,
+                    // onChanged: (val) => setState(() => selectedStatus = val),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -104,13 +166,12 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
                     horizontal: 16,
                     // vertical: 4,
                   ),
-                  child: AccountsDropdownField(
+                  child: AuthFieldLabel(
                     label: "الى الحساب",
-                    hint:  "اختر الحساب الذي تريد التحويل اليه",
-                    hintFontSize: 14,
-                    selectedValue: selectedAccount,
-                    items: accounts,
-                    onChanged: (val) => setState(() => selectedAccount = val),
+                    hint: "اختر الحساب الذي تريد التحويل اليه",
+                    suffixIcon: Icons.edit,
+                    keyboardType: TextInputType.text,
+                    onChanged: (value) {},
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -126,7 +187,7 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
                     label: "المبلغ",
                     hint: "ادخل مبلغا تريد ايداعه في الحساب...",
                     suffixIcon: Icons.credit_card_outlined,
-                    keyboardType: TextInputType.text,
+                    keyboardType: TextInputType.number,
                     onChanged: (value) {
                       // context.read<SubmitComplaintCubit>().titleChanged(value);
                     },
@@ -141,13 +202,13 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
                     horizontal: 16,
                     // vertical: 4,
                   ),
-                  child: AccountsDropdownField(
+                  child: AuthFieldLabel(
+                    controller: nameController,
                     label: 'اسم الحساب',
-                    hint: "ادخل اسم الحساب الخاص بك للتعديل...",
-                    hintFontSize: 14,
-                    selectedValue: selectedAccount,
-                    items: accounts,
-                    onChanged: (val) => setState(() => selectedAccount = val),
+                    hint: "ادخل اسم الحساب الجديد للتعديل...",
+                    suffixIcon: Icons.edit,
+                    keyboardType: TextInputType.text,
+                    onChanged: (v) => widget.onNameChanged?.call(v),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -159,12 +220,16 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
                     // vertical: 4,
                   ),
                   child: AccountsDropdownField(
-                    label:  'حالة الحساب',
+                    label: 'حالة الحساب',
                     hint: "اختار حالة الحساب للتعديل...",
-                    hintFontSize: 14,
-                    selectedValue: selectedAccount,
-                    items: accounts,
-                    onChanged: (val) => setState(() => selectedAccount = val),
+                    hintFontSize: 16,
+                    hintColor: AppColor.middleGrey,
+                    selectedValue: selectedStatus,
+                    items: items,
+                    onChanged: (val) {
+                      setState(() => selectedStatus = val);
+                      widget.onDropdownChanged?.call(val);
+                    },
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -176,13 +241,13 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
                     // vertical: 4,
                   ),
                   child: AuthFieldLabel(
+                    controller: descController,
                     label: 'وصف الحساب',
                     hint: "ادخل وصفا للحساب الخاص بك للتعديل...",
                     suffixIcon: Icons.layers_outlined,
                     keyboardType: TextInputType.text,
-                    onChanged: (value) {
-                      // context.read<SubmitComplaintCubit>().titleChanged(value);
-                    },
+
+                    onChanged: (v) => widget.onDescriptionChanged?.call(v),
                   ),
                 ),
                 const SizedBox(height: 35),
@@ -194,17 +259,67 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
                 childHorizontalPad: SizeConfig.width * .07,
                 childVerticalPad: SizeConfig.height * .012,
                 borderRadius: 10,
+
+                // onTap: () {
+                //   final cubit = context.read<AccountManagCubit>();
+
+                //   // ✅ منع الإرسال مرتين
+                //   // if (cubit.state.isSubmitting) return;
+
+                //   final name = nameController.text.trim();
+                //   final desc = descController.text.trim();
+                //   final status = selectedStatus?.trim();
+
+                //   // ✅ Validation بسيطة
+                //   if (name.isEmpty) {
+                //     // إذا بدك سناكبار سريع بدل state message:
+                //     ScaffoldMessenger.of(context).showSnackBar(
+                //       const SnackBar(content: Text('اسم الحساب مطلوب')),
+                //     );
+                //     return;
+                //   }
+
+                //   if (status == null || status.isEmpty) {
+                //     ScaffoldMessenger.of(context).showSnackBar(
+                //       const SnackBar(content: Text('اختر حالة الحساب')),
+                //     );
+                //     return;
+                //   }
+
+                //   // ✅ خزّن القيم بالـ Cubit
+                //   cubit.editNameChanged(name);
+                //   cubit.editDescriptionChanged(desc);
+                //   cubit.editStatusChanged(status);
+
+                //   // ✅ Debug: شو عم ينبعت بالضبط
+                //   debugPrint(
+                //     "============ BottomSheet Submit UpdateAccount ============",
+                //   );
+                //   debugPrint("name: $name");
+                //   debugPrint("status: $status");
+                //   debugPrint("description: $desc");
+                //   debugPrint(
+                //     "=========================================================",
+                //   );
+
+                //   // ✅ نفّذ
+                //   cubit.submitUpdateAccount();
+                // },
                 onTap: () {
-                  // if (_formKey.currentState?.validate() ?? false) {
-                  //   debugPrint("im at confirm log innnnnn");
-                  //   context.read<LoginCubit>().loginSubmitted();
-                  // }
+                  if (widget.isSubmitting) return;
+                  widget.onSubmit();
                 },
-                child: CustomTextWidget(
-                  "تأكيد الارسال",
-                  fontSize: SizeConfig.height * .025,
-                  color: AppColor.white,
-                ),
+                child: widget.isSubmitting
+                    ? const SizedBox(
+                        height: 22,
+                        width: 22,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : CustomTextWidget(
+                        "تأكيد الارسال",
+                        fontSize: SizeConfig.height * .025,
+                        color: AppColor.white,
+                      ),
               ),
             ],
           ),

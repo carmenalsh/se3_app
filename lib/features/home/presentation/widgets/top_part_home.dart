@@ -28,7 +28,7 @@ class TopPartHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // String welcomeMessage = CacheHelper.getData(key: "welcomeMessage") ?? "";
+    String welcomeMessage = CacheHelper.getData(key: "welcomeMessage") ?? "";
     return CustomBackgroundWithChild(
       width: double.infinity,
       backgroundColor: AppColor.primary,
@@ -45,7 +45,7 @@ class TopPartHome extends StatelessWidget {
               children: [
                 CustomTextWidget(
                   //  welcomeMessage,
-                  "مرحبا صديقي المستخدم محمد منصور",
+                  welcomeMessage,
                   color: AppColor.white,
                   fontSize: SizeConfig.diagonal * .028,
                 ),

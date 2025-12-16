@@ -1,0 +1,61 @@
+import 'package:complaints_app/features/app_services/domain/entities/account_select_item_entity.dart';
+import 'package:equatable/equatable.dart';
+
+enum AppServicesStatus { initial, loading, success, error }
+
+class AppServicesState extends Equatable {
+  final AppServicesStatus status;
+
+  // ✅ حسابات السيلكت (forSelect)
+  final List<AccountSelectItemEntity> accountsForSelect;
+
+  // ✅ اختيار المستخدم (من الدروب داون)
+  final int? selectedFromAccountId;
+  final String? selectedFromAccountName;
+
+  // ✅ للـ loading
+  final bool isSubmitting;
+
+  final String? message;
+
+  const AppServicesState({
+    this.status = AppServicesStatus.initial,
+    this.accountsForSelect = const [],
+    this.selectedFromAccountId,
+    this.selectedFromAccountName,
+    this.isSubmitting = false,
+    this.message,
+  });
+
+  bool get hasAccounts => accountsForSelect.isNotEmpty;
+
+  AppServicesState copyWith({
+    AppServicesStatus? status,
+    List<AccountSelectItemEntity>? accountsForSelect,
+    int? selectedFromAccountId,
+    String? selectedFromAccountName,
+    bool? isSubmitting,
+    String? message,
+    bool clearMessage = false,
+  }) {
+    return AppServicesState(
+      status: status ?? this.status,
+      accountsForSelect: accountsForSelect ?? this.accountsForSelect,
+      selectedFromAccountId: selectedFromAccountId ?? this.selectedFromAccountId,
+      selectedFromAccountName:
+          selectedFromAccountName ?? this.selectedFromAccountName,
+      isSubmitting: isSubmitting ?? this.isSubmitting,
+      message: clearMessage ? null : (message ?? this.message),
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+        status,
+        accountsForSelect,
+        selectedFromAccountId,
+        selectedFromAccountName,
+        isSubmitting,
+        message,
+      ];
+}
