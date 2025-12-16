@@ -15,8 +15,15 @@ class AppServicesState extends Equatable {
 
   // ✅ للـ loading
   final bool isSubmitting;
+  final bool depositSuccess;
 
   final String? message;
+
+  final String operationNameChanged;
+
+  // ✅ فلاج نجاح مرة واحدة (ليسكر البوتم شيت بالـ Listener)
+  final bool withdrawSuccess;
+  final String amountChanged;
 
   const AppServicesState({
     this.status = AppServicesStatus.initial,
@@ -24,7 +31,13 @@ class AppServicesState extends Equatable {
     this.selectedFromAccountId,
     this.selectedFromAccountName,
     this.isSubmitting = false,
+
     this.message,
+    this.operationNameChanged = '',
+    this.amountChanged = '',
+
+    this.withdrawSuccess = false,
+    this.depositSuccess = false,
   });
 
   bool get hasAccounts => accountsForSelect.isNotEmpty;
@@ -37,25 +50,38 @@ class AppServicesState extends Equatable {
     bool? isSubmitting,
     String? message,
     bool clearMessage = false,
+    String? operationNameChanged,
+    String? amountChanged,
+    bool? withdrawSuccess,
+    bool? depositSuccess,
   }) {
     return AppServicesState(
       status: status ?? this.status,
       accountsForSelect: accountsForSelect ?? this.accountsForSelect,
-      selectedFromAccountId: selectedFromAccountId ?? this.selectedFromAccountId,
+      selectedFromAccountId:
+          selectedFromAccountId ?? this.selectedFromAccountId,
       selectedFromAccountName:
           selectedFromAccountName ?? this.selectedFromAccountName,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       message: clearMessage ? null : (message ?? this.message),
+      operationNameChanged: operationNameChanged ?? this.operationNameChanged,
+      amountChanged: amountChanged ?? this.amountChanged,
+      withdrawSuccess: withdrawSuccess ?? this.withdrawSuccess,
+      depositSuccess: depositSuccess ?? this.depositSuccess,
     );
   }
 
   @override
   List<Object?> get props => [
-        status,
-        accountsForSelect,
-        selectedFromAccountId,
-        selectedFromAccountName,
-        isSubmitting,
-        message,
-      ];
+    status,
+    accountsForSelect,
+    selectedFromAccountId,
+    selectedFromAccountName,
+    isSubmitting,
+    message,
+    amountChanged,
+    operationNameChanged,
+    withdrawSuccess,
+    depositSuccess,
+  ];
 }

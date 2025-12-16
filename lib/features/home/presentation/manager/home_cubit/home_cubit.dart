@@ -20,6 +20,7 @@ class HomeCubit extends Cubit<HomeState> {
   // final GetNotificationsUseCase _getNotificationsUseCase;
 
   Future<void> loadTransAction({int page = 1, int perPage = 10}) async {
+    if (isClosed) return;
     debugPrint("============ HomeCubit.loadTransAction ============");
     debugPrint(
       "loadTransAction -> , current Page: ${state.currentPage} , last page: ${state.lastPage}, per page: ${state.perPage}",
@@ -37,7 +38,7 @@ class HomeCubit extends Cubit<HomeState> {
     final result = await _getTransActionUseCase(
       GetTransActionParams(page: page, perPage: perPage),
     );
-
+if (isClosed) return;
     result.fold(
       (failure) {
         debugPrint("loadTransAction -> FAILURE: ${failure.errMessage}");
@@ -65,6 +66,7 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   Future<void> loadMoreTransAction() async {
+    if (isClosed) return;
     debugPrint(
       "============ HomeCubit.loadMoreTransActionnnnnnnnnnnnnnnnnn ============",
     );
@@ -78,7 +80,7 @@ class HomeCubit extends Cubit<HomeState> {
     final result = await _getTransActionUseCase(
       GetTransActionParams(page: nextPage, perPage: state.perPage),
     );
-
+if (isClosed) return;
     result.fold(
       (failure) => emit(
         state.copyWith(isLoadingMore: false, message: failure.errMessage),
@@ -97,6 +99,21 @@ class HomeCubit extends Cubit<HomeState> {
       },
     );
   }
+  Future<void> refreshTransactions() async {
+    if (isClosed) return;
+  emit(state.copyWith(
+    status: HomeStatusEnum.loading,
+    transActions: [],
+    currentPage: 1,
+    lastPage: 1,
+    isLoadingMore: false,
+    message: null,
+  ));
+
+  await loadTransAction(page: 1, perPage: state.perPage);
+  if (isClosed) return;
+}
+
 
   // void searchTextChanged(String value) {
   //   debugPrint("HomeCubit.searchTextChanged -> $value");

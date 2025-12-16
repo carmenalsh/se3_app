@@ -28,6 +28,10 @@ class EndPoints {
   static const String createAccount = 'citizen/Account/create';
   // app services
   static const String accountsForSelect = 'citizen/Account/forSelect';
+  static const String withdraw  = 'citizen/services/withdraw';
+  static const String deposit  = 'citizen/services/deposit';
+
+
 
 
   // submit a complaint

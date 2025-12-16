@@ -52,34 +52,21 @@ class HomeViewBody extends StatelessWidget {
           onChangedSearch: (value) {
             // context.read<HomeCubit>().searchTextChanged(value);
           },
-          onTapServices: () {
-            // debugPrint("loggg outtttt");
-            // context.read<LogoutCubit>().logOutSubmitted();
-            context.pushNamed(AppRouteRName.showServices);
+          onTapServices: () async {
+            final changed = await context.pushNamed<bool>(
+              AppRouteRName.showServices,
+            );
+
+            if (changed == true) {
+              context.read<HomeCubit>().refreshTransactions();
+            }
+
+           
           },
 
           onTapAccountsManag: () {
             context.pushNamed(AppRouteRName.accountManag);
-            // final dummyNotifications = <NotificationItem>[
-            //   const NotificationItem(
-            //     title: 'تم تسجيل شكوى جديدة',
-            //     body:
-            //         'تم استلام شكواك وسيتم تحويلها إلى الجهة المختصة للمعالجة.',
-            //     date: 'منذ دقيقة',
-            //   ),
-            //   const NotificationItem(
-            //     title: 'تحديث حالة الشكوى رقم 11',
-            //     body: 'تم تغيير حالة الشكوى إلى: قيد المعالجة.',
-            //     date: 'قبل 10 دقائق',
-            //   ),
-            //   const NotificationItem(
-            //     title: 'تم إغلاق الشكوى رقم 8',
-            //     body: 'تمت معالجة الشكوى وإغلاقها. شكراً لتعاونك.',
-            //     date: 'اليوم - 10:30 ص',
-            //   ),
-            // ];
-
-            // showNotificationsBottomSheet(parentContext: context);
+           
           },
 
           onSearchTap: (query) {
@@ -110,6 +97,7 @@ class HomeViewBody extends StatelessWidget {
         SizedBox(height: SizeConfig.height * .001),
         Expanded(
           child: BlocBuilder<HomeCubit, HomeState>(
+
             builder: (context, state) {
               if (state.status == HomeStatusEnum.loading &&
                   state.transActions.isEmpty) {

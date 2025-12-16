@@ -10,7 +10,9 @@ import 'package:complaints_app/features/account_manag/presentation/manager/accou
 import 'package:complaints_app/features/account_manag/presentation/view/account_manag_page.dart';
 import 'package:complaints_app/features/app_services/data/data_source/app_services_remote_data_source.dart';
 import 'package:complaints_app/features/app_services/data/repository_impl/app_services_repository_impl.dart';
+import 'package:complaints_app/features/app_services/domain/use_case/deposit_use_case.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/get_accounts_for_select_use_case.dart';
+import 'package:complaints_app/features/app_services/domain/use_case/withdraw_use_case.dart';
 import 'package:complaints_app/features/app_services/presentation/manager/app_services_cubit.dart';
 import 'package:complaints_app/features/app_services/presentation/view/app_services_page.dart';
 import 'package:complaints_app/features/auth/data/datasources/auth_remote_data_source.dart';
@@ -400,11 +402,16 @@ abstract class AppRourer {
           final getAccounts = GetAccountsForSelectUseCase(
             repository: repository,
           );
-         return MultiBlocProvider(
+          final withdrawUseCase = WithdrawUseCase(repository: repository);
+          final depositUseCase = DepositUseCase(repository: repository);
+          return MultiBlocProvider(
             providers: [
               BlocProvider(
-                create: (_) =>
-                    AppServicesCubit(getAccountsForSelectUseCase: getAccounts),
+                create: (_) => AppServicesCubit(
+                  getAccountsForSelectUseCase: getAccounts,
+                  withdrawUseCase: withdrawUseCase,
+                  depositUseCase: depositUseCase,
+                ),
                 child: const AppServicesPage(),
               ),
             ],

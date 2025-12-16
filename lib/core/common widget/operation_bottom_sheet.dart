@@ -21,6 +21,9 @@ class OperationBottomSheet extends StatefulWidget {
   final ValueChanged<String>? onDescriptionChanged;
   final List<String> dropdownItems;
 
+  final ValueChanged<String>? onAmountChanged;
+  final ValueChanged<String>? onOperationNameChanged;
+
   final Map<String, int> nameToId;
   final ValueChanged<int?>? onFromAccountIdChanged;
 
@@ -38,6 +41,8 @@ class OperationBottomSheet extends StatefulWidget {
     this.onDropdownChanged,
     this.nameToId = const {},
     this.onFromAccountIdChanged,
+    this.onAmountChanged,
+    this.onOperationNameChanged,
   });
 
   @override
@@ -127,7 +132,7 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
                     hint: "ادخل عنونا للعملية المالية...",
                     keyboardType: TextInputType.text,
                     onChanged: (value) {
-                      // context.read<SubmitComplaintCubit>().titleChanged(value);
+                      widget.onOperationNameChanged?.call(value);
                     },
                   ),
                 ),
@@ -189,7 +194,7 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
                     suffixIcon: Icons.credit_card_outlined,
                     keyboardType: TextInputType.number,
                     onChanged: (value) {
-                      // context.read<SubmitComplaintCubit>().titleChanged(value);
+                      widget.onAmountChanged?.call(value); // ✅ السطر الوحيد
                     },
                   ),
                 ),
