@@ -1,7 +1,9 @@
 import 'package:complaints_app/features/app_services/domain/use_case/deposit_use_case.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/get_accounts_for_select_use_case.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/params/deposit_params.dart';
+import 'package:complaints_app/features/app_services/domain/use_case/params/transfer_params.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/params/withdraw_params.dart';
+import 'package:complaints_app/features/app_services/domain/use_case/transfer_use_case.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/withdraw_use_case.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,10 +13,12 @@ class AppServicesCubit extends Cubit<AppServicesState> {
   final GetAccountsForSelectUseCase getAccountsForSelectUseCase;
   final WithdrawUseCase withdrawUseCase;
   final DepositUseCase depositUseCase;
+  final TransferUseCase transferUseCase;
   AppServicesCubit({
     required this.getAccountsForSelectUseCase,
     required this.withdrawUseCase,
     required this.depositUseCase,
+    required this.transferUseCase,
   }) : super(const AppServicesState());
 
   /// تحميل قائمة الحسابات (للاستخدام في السحب/الإيداع...)
@@ -126,60 +130,133 @@ class AppServicesCubit extends Cubit<AppServicesState> {
 
     debugPrint("=================================================");
   }
+
   Future<void> submitDeposit() async {
-  debugPrint("============ AppServicesCubit.submitDeposit ============");
+    debugPrint("============ AppServicesCubit.submitDeposit ============");
 
-  if (state.isSubmitting) return;
+    if (state.isSubmitting) return;
 
-  final accountId = state.selectedFromAccountId;
-  final name = state.operationNameChanged.trim();
-  final amount = state.amountChanged.trim();
+    final accountId = state.selectedFromAccountId;
+    final name = state.operationNameChanged.trim();
+    final amount = state.amountChanged.trim();
 
-  if (accountId == null) {
-    emit(state.copyWith(message: "اختر الحساب", clearMessage: false));
-    return;
+    if (accountId == null) {
+      emit(state.copyWith(message: "اختر الحساب", clearMessage: false));
+      return;
+    }
+    if (name.isEmpty) {
+      emit(state.copyWith(message: "اكتب عنوان العملية", clearMessage: false));
+      return;
+    }
+    if (amount.isEmpty) {
+      emit(state.copyWith(message: "ادخل المبلغ", clearMessage: false));
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        isSubmitting: true,
+        depositSuccess: false, // ✅
+        clearMessage: true,
+      ),
+    );
+
+    final params = DepositParams(
+      accountId: accountId,
+      name: name,
+      amount: amount,
+    );
+
+    final result = await depositUseCase.call(params);
+
+    result.fold(
+      (failure) {
+        debugPrint("✗ submitDeposit failed: ${failure.errMessage}");
+        emit(state.copyWith(isSubmitting: false, message: failure.errMessage));
+      },
+      (success) {
+        debugPrint("✓ submitDeposit success: ${success.successMessage}");
+        emit(
+          state.copyWith(
+            isSubmitting: false,
+            message: success.successMessage,
+            depositSuccess: true, // ✅ مرة واحدة
+          ),
+        );
+      },
+    );
+
+    debugPrint("=================================================");
   }
-  if (name.isEmpty) {
-    emit(state.copyWith(message: "اكتب عنوان العملية", clearMessage: false));
-    return;
+
+  Future<void> submitTransfer() async {
+    debugPrint("============ AppServicesCubit.submitTransfer ============");
+
+    if (state.isSubmitting) return;
+
+    final fromAccountId = state.selectedFromAccountId;
+    final name = state.operationNameChanged.trim();
+    final amount = state.amountChanged.trim();
+    final toAccountNumber = state.toAccountNumberChanged.trim();
+
+    if (fromAccountId == null) {
+      emit(state.copyWith(message: "اختر الحساب", clearMessage: false));
+      return;
+    }
+    if (name.isEmpty) {
+      emit(state.copyWith(message: "اكتب عنوان العملية", clearMessage: false));
+      return;
+    }
+    if (amount.isEmpty) {
+      emit(state.copyWith(message: "ادخل المبلغ", clearMessage: false));
+      return;
+    }
+    if (toAccountNumber.isEmpty) {
+      emit(
+        state.copyWith(
+          message: "ادخل رقم الحساب المستقبِل",
+          clearMessage: false,
+        ),
+      );
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        isSubmitting: true,
+        transferSuccess: false,
+        clearMessage: true,
+      ),
+    );
+
+    final params = TransferParams(
+      accountId: fromAccountId,
+      name: name,
+      amount: amount,
+      toAccountNumber: toAccountNumber,
+    );
+
+    final result = await transferUseCase.call(params);
+
+    result.fold(
+      (failure) {
+        debugPrint("✗ submitTransfer failed: ${failure.errMessage}");
+        emit(state.copyWith(isSubmitting: false, message: failure.errMessage));
+      },
+      (success) {
+        debugPrint("✓ submitTransfer success: ${success.successMessage}");
+        emit(
+          state.copyWith(
+            isSubmitting: false,
+            message: success.successMessage,
+            transferSuccess: true,
+          ),
+        );
+      },
+    );
+
+    debugPrint("=================================================");
   }
-  if (amount.isEmpty) {
-    emit(state.copyWith(message: "ادخل المبلغ", clearMessage: false));
-    return;
-  }
-
-  emit(state.copyWith(
-    isSubmitting: true,
-    depositSuccess: false, // ✅
-    clearMessage: true,
-  ));
-
-  final params = DepositParams(
-    accountId: accountId,
-    name: name,
-    amount: amount,
-  );
-
-  final result = await depositUseCase.call(params);
-
-  result.fold(
-    (failure) {
-      debugPrint("✗ submitDeposit failed: ${failure.errMessage}");
-      emit(state.copyWith(isSubmitting: false, message: failure.errMessage));
-    },
-    (success) {
-      debugPrint("✓ submitDeposit success: ${success.successMessage}");
-      emit(state.copyWith(
-        isSubmitting: false,
-        message: success.successMessage,
-        depositSuccess: true, // ✅ مرة واحدة
-      ));
-    },
-  );
-
-  debugPrint("=================================================");
-}
-
 
   /// تحديث الحساب المختار من القائمة
   void fromAccountIdChanged(int? id) {
@@ -203,9 +280,18 @@ class AppServicesCubit extends Cubit<AppServicesState> {
     if (!state.withdrawSuccess) return;
     emit(state.copyWith(withdrawSuccess: false));
   }
-  void resetDepositSuccess() {
-  if (!state.depositSuccess) return;
-  emit(state.copyWith(depositSuccess: false));
-}
 
+  void resetDepositSuccess() {
+    if (!state.depositSuccess) return;
+    emit(state.copyWith(depositSuccess: false));
+  }
+
+  void toAccountNumberChanged(String value) {
+    emit(state.copyWith(toAccountNumberChanged: value));
+  }
+
+  void resetTransferSuccess() {
+    if (!state.transferSuccess) return;
+    emit(state.copyWith(transferSuccess: false));
+  }
 }

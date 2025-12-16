@@ -14,173 +14,176 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class AppServicesPage extends StatelessWidget {
   const AppServicesPage({super.key});
 
-//   Future<void> _openOperationWithAccounts(
-//     BuildContext context, {
-//     required OperationType type,
-//   }) async {
-//     final cubit = context.read<AppServicesCubit>();
-//     await cubit.loadAccountsForSelect();
+  //   Future<void> _openOperationWithAccounts(
+  //     BuildContext context, {
+  //     required OperationType type,
+  //   }) async {
+  //     final cubit = context.read<AppServicesCubit>();
+  //     await cubit.loadAccountsForSelect();
 
-//     final state = cubit.state;
+  //     final state = cubit.state;
 
-//     if (state.status == AppServicesStatus.error && state.message != null) {
-//       ScaffoldMessenger.of(
-//         context,
-//       ).showSnackBar(SnackBar(content: Text(state.message!)));
-//       return;
-//     }
+  //     if (state.status == AppServicesStatus.error && state.message != null) {
+  //       ScaffoldMessenger.of(
+  //         context,
+  //       ).showSnackBar(SnackBar(content: Text(state.message!)));
+  //       return;
+  //     }
 
-//     final accounts = state.accountsForSelect;
-//     if (accounts.isEmpty) {
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         const SnackBar(content: Text('No accounts available right now')),
-//       );
-//       return;
-//     }
+  //     final accounts = state.accountsForSelect;
+  //     if (accounts.isEmpty) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(content: Text('No accounts available right now')),
+  //       );
+  //       return;
+  //     }
 
-//     final names = accounts.map((e) => e.name).toList();
-//     final map = {for (final a in accounts) a.name: a.id};
+  //     final names = accounts.map((e) => e.name).toList();
+  //     final map = {for (final a in accounts) a.name: a.id};
 
-//     final config = operationConfigs[type]!;
+  //     final config = operationConfigs[type]!;
 
-//     // showModalBottomSheet(
-//     //   context: context,
-//     //   isScrollControlled: true,
-//     //   builder: (_) => OperationBottomSheet(
-//     //     config: config,
-//     //     dropdownItems: names,
-//     //     nameToId: map,
-//     //     isSubmitting: state.isSubmitting,
-//         // onFromAccountIdChanged: cubit.fromAccountIdChanged,
-//     //     onSubmit: () {
-//     //       // TODO: connect submit action for this operation
-//     //     },
-//     //   ),
-//     // );
-//     showModalBottomSheet(
-//   context: context,
-//   isScrollControlled: true,
-//   builder: (_) => BlocListener<AppServicesCubit, AppServicesState>(
-//     listenWhen: (p, c) =>
-//         p.message != c.message && c.message != null,
-//     listener: (context, state) {
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text(state.message!)),
-//       );
+  //     // showModalBottomSheet(
+  //     //   context: context,
+  //     //   isScrollControlled: true,
+  //     //   builder: (_) => OperationBottomSheet(
+  //     //     config: config,
+  //     //     dropdownItems: names,
+  //     //     nameToId: map,
+  //     //     isSubmitting: state.isSubmitting,
+  //         // onFromAccountIdChanged: cubit.fromAccountIdChanged,
+  //     //     onSubmit: () {
+  //     //       // TODO: connect submit action for this operation
+  //     //     },
+  //     //   ),
+  //     // );
+  //     showModalBottomSheet(
+  //   context: context,
+  //   isScrollControlled: true,
+  //   builder: (_) => BlocListener<AppServicesCubit, AppServicesState>(
+  //     listenWhen: (p, c) =>
+  //         p.message != c.message && c.message != null,
+  //     listener: (context, state) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text(state.message!)),
+  //       );
 
-//       // ✅ سكّر البوتم شيت عند نجاح السحب فقط
-//       if (state.withdrawSuccess) {
-//         Navigator.pop(context);
-//         context.read<AppServicesCubit>().resetWithdrawSuccess();
-//       }
-//     },
-//     child: OperationBottomSheet(
-//       config: config,
-//       dropdownItems: names,
-//       nameToId: map,
-//       isSubmitting: context.watch<AppServicesCubit>().state.isSubmitting,
+  //       // ✅ سكّر البوتم شيت عند نجاح السحب فقط
+  //       if (state.withdrawSuccess) {
+  //         Navigator.pop(context);
+  //         context.read<AppServicesCubit>().resetWithdrawSuccess();
+  //       }
+  //     },
+  //     child: OperationBottomSheet(
+  //       config: config,
+  //       dropdownItems: names,
+  //       nameToId: map,
+  //       isSubmitting: context.watch<AppServicesCubit>().state.isSubmitting,
 
-//       // ✅ ربط الحساب
-//       onFromAccountIdChanged: cubit.fromAccountIdChanged,
+  //       // ✅ ربط الحساب
+  //       onFromAccountIdChanged: cubit.fromAccountIdChanged,
 
-//       // ✅ ربط اسم العملية
-//       onOperationNameChanged: cubit.withdrawNameChanged,
+  //       // ✅ ربط اسم العملية
+  //       onOperationNameChanged: cubit.withdrawNameChanged,
 
-//       // ✅ ربط المبلغ
-//       onAmountChanged: cubit.withdrawAmountChanged,
+  //       // ✅ ربط المبلغ
+  //       onAmountChanged: cubit.withdrawAmountChanged,
 
-//       // ✅ زر الإرسال (سحب فقط)
-//       onSubmit: () {
-//         cubit.submitWithdraw();
-//       },
-//     ),
-//   ),
-// );
+  //       // ✅ زر الإرسال (سحب فقط)
+  //       onSubmit: () {
+  //         cubit.submitWithdraw();
+  //       },
+  //     ),
+  //   ),
+  // );
 
-//   }
-Future<void> _openOperationWithAccounts(
-  BuildContext context, {
-  required OperationType type,
-}) async {
-  final cubit = context.read<AppServicesCubit>();
-  await cubit.loadAccountsForSelect();
+  //   }
+  Future<void> _openOperationWithAccounts(
+    BuildContext context, {
+    required OperationType type,
+  }) async {
+    final cubit = context.read<AppServicesCubit>();
+    await cubit.loadAccountsForSelect();
 
-  final state = cubit.state;
+    final state = cubit.state;
 
-  if (state.status == AppServicesStatus.error && state.message != null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(state.message!)),
-    );
-    return;
-  }
+    if (state.status == AppServicesStatus.error && state.message != null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(state.message!)));
+      return;
+    }
 
-  final accounts = state.accountsForSelect;
-  if (accounts.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('No accounts available right now')),
-    );
-    return;
-  }
+    final accounts = state.accountsForSelect;
+    if (accounts.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No accounts available right now')),
+      );
+      return;
+    }
 
-  final names = accounts.map((e) => e.name).toList();
-  final map = {for (final a in accounts) a.name: a.id};
+    final names = accounts.map((e) => e.name).toList();
+    final map = {for (final a in accounts) a.name: a.id};
 
-  final config = operationConfigs[type]!;
+    final config = operationConfigs[type]!;
 
-  final result = await showModalBottomSheet<bool>(
-  context: context,
-  isScrollControlled: true,
-  builder: (sheetContext) => BlocProvider.value(
-    value: cubit,
-    child: BlocListener<AppServicesCubit, AppServicesState>(
-      listenWhen: (p, c) =>
-          (p.message != c.message && c.message != null) ||
-          (p.withdrawSuccess != c.withdrawSuccess) ||
-          (p.depositSuccess != c.depositSuccess),
-      listener: (ctx, st) {
-        if (st.message != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(st.message!)),
-          );
-        }
+    final result = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) => BlocProvider.value(
+        value: cubit,
+        child: BlocListener<AppServicesCubit, AppServicesState>(
+          listenWhen: (p, c) => p.message != c.message && c.message != null,
+          listener: (ctx, st) {
+            // ✅ 1) رسالة نجاح/فشل
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(st.message!)));
 
-        final isSuccess = (type == OperationType.withdraw && st.withdrawSuccess)
-            || (type == OperationType.deposit && st.depositSuccess);
+            final success =
+                st.withdrawSuccess || st.depositSuccess || st.transferSuccess;
 
-        if (isSuccess) {
-          Navigator.pop(sheetContext, true);
+            if (success) {
+              // ✅ 2) سكّر البوتم شيت + ارجع true
+              Navigator.pop(sheetContext, true);
 
-          if (type == OperationType.withdraw) {
-            ctx.read<AppServicesCubit>().resetWithdrawSuccess();
-          } else if (type == OperationType.deposit) {
-            ctx.read<AppServicesCubit>().resetDepositSuccess();
-          }
-        }
-      },
-      child: OperationBottomSheet(
-        config: config,
-        dropdownItems: names,
-        nameToId: map,
-        isSubmitting: cubit.state.isSubmitting,
-        onFromAccountIdChanged: cubit.fromAccountIdChanged,
-        onOperationNameChanged: cubit.operationNameChanged, // (اسمها عام عندك)
-        onAmountChanged: cubit.amountChanged,       // (اسمها عام عندك)
-        onSubmit: () {
-          if (type == OperationType.withdraw) {
-            cubit.submitWithdraw();
-          } else if (type == OperationType.deposit) {
-            cubit.submitDeposit();
-          }
-        },
+              // ✅ reset flags حسب العملية (مهم)
+              if (st.withdrawSuccess) cubit.resetWithdrawSuccess();
+              if (st.depositSuccess) cubit.resetDepositSuccess();
+              if (st.transferSuccess) cubit.resetTransferSuccess();
+            }
+          },
+
+          child: BlocBuilder<AppServicesCubit, AppServicesState>(
+            builder: (_, st) {
+              return OperationBottomSheet(
+                config: config,
+                dropdownItems: names,
+                nameToId: map,
+                isSubmitting: st.isSubmitting,
+                onFromAccountIdChanged: cubit.fromAccountIdChanged,
+                onOperationNameChanged: cubit.operationNameChanged,
+                onAmountChanged: cubit.amountChanged,
+                onToAccountNumberChanged: (type == OperationType.transfer)
+                    ? cubit.toAccountNumberChanged
+                    : null,
+                onSubmit: () {
+                  if (type == OperationType.withdraw) cubit.submitWithdraw();
+                  if (type == OperationType.deposit) cubit.submitDeposit();
+                  if (type == OperationType.transfer) cubit.submitTransfer();
+                },
+              );
+            },
+          ),
+        ),
       ),
-    ),
-  ),
-);
+    );
 
-  if (result == true) {
-    Navigator.pop(context, true);
-}
-}
+    // ✅ 3) إذا نجحت العملية ارجع true للي فوقك (الصفحة السابقة)
+    if (result == true) {
+      Navigator.pop(context, true); // يعني AppServicesPage رجّع true للـ Home
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -203,7 +206,6 @@ Future<void> _openOperationWithAccounts(
                             onTap: () => _openOperationWithAccounts(
                               context,
                               type: OperationType.withdraw,
-                              
                             ),
                             child: ComplaintInformationWidget(
                               titleColor: AppColor.black,
@@ -218,7 +220,6 @@ Future<void> _openOperationWithAccounts(
                             onTap: () => _openOperationWithAccounts(
                               context,
                               type: OperationType.deposit,
-                              
                             ),
                             child: ComplaintInformationWidget(
                               titleColor: AppColor.black,
@@ -230,19 +231,23 @@ Future<void> _openOperationWithAccounts(
                           DividerWidget(),
                           SizedBox(width: 25),
                           InkWell(
-                            onTap: () {
-                              final config =
-                                  operationConfigs[OperationType.transfer]!;
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                builder: (_) => OperationBottomSheet(
-                                  config: config,
-                                  isSubmitting: false,
-                                  onSubmit: () {},
-                                ),
-                              );
-                            },
+                            // onTap: () {
+                            //   final config =
+                            //       operationConfigs[OperationType.transfer]!;
+                            //   showModalBottomSheet(
+                            //     context: context,
+                            //     isScrollControlled: true,
+                            //     builder: (_) => OperationBottomSheet(
+                            //       config: config,
+                            //       isSubmitting: false,
+                            //       onSubmit: () {},
+                            //     ),
+                            //   );
+                            // },
+                            onTap: () => _openOperationWithAccounts(
+                              context,
+                              type: OperationType.transfer,
+                            ),
                             child: ComplaintInformationWidget(
                               titleColor: AppColor.black,
                               image: AppImage.transformation,

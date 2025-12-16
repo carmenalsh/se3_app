@@ -2,8 +2,10 @@ import 'package:complaints_app/core/databases/api/api_consumer.dart';
 import 'package:complaints_app/core/databases/api/end_points.dart';
 import 'package:complaints_app/features/app_services/data/models/account_select_item_model.dart';
 import 'package:complaints_app/features/app_services/data/models/deposit_result_model.dart';
+import 'package:complaints_app/features/app_services/data/models/transfer_result_model.dart';
 import 'package:complaints_app/features/app_services/data/models/withdraw_result_model.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/params/deposit_params.dart';
+import 'package:complaints_app/features/app_services/domain/use_case/params/transfer_params.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/params/withdraw_params.dart';
 import 'package:flutter/material.dart';
 
@@ -15,6 +17,7 @@ abstract class AppServicesRemoteDataSource {
     Future<DepositResultModel> deposit({
     required DepositParams params,
   });
+   Future<TransferResultModel> transfer({required TransferParams params});
 }
 
 class AppServicesRemoteDataSourceImpl implements AppServicesRemoteDataSource {
@@ -80,4 +83,24 @@ Future<WithdrawResultModel> withdraw({required WithdrawParams params}) async {
 
     return DepositResultModel.fromJson(map);
   }
+  
+  @override
+  Future<TransferResultModel> transfer({required TransferParams params}) async {
+    debugPrint("============ AppServicesRemoteDataSourceImpl.transfer ============");
+
+    final response = await apiConsumer.post(
+      EndPoints.transfer, // لازم تضيفه بالـ EndPoints
+      data: params.toMap(),
+    );
+
+    debugPrint("← response (transfer): $response");
+    debugPrint("=================================================");
+
+    final map = response is Map<String, dynamic>
+        ? response
+        : (response.data as Map<String, dynamic>);
+
+    return TransferResultModel.fromJson(map);
+  }
+  
 }

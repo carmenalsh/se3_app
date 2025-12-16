@@ -23,6 +23,7 @@ class OperationBottomSheet extends StatefulWidget {
 
   final ValueChanged<String>? onAmountChanged;
   final ValueChanged<String>? onOperationNameChanged;
+  final ValueChanged<String>? onToAccountNumberChanged;
 
   final Map<String, int> nameToId;
   final ValueChanged<int?>? onFromAccountIdChanged;
@@ -43,6 +44,7 @@ class OperationBottomSheet extends StatefulWidget {
     this.onFromAccountIdChanged,
     this.onAmountChanged,
     this.onOperationNameChanged,
+    this.onToAccountNumberChanged,
   });
 
   @override
@@ -156,16 +158,13 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
                       selectedFromAccountId = id;
                       widget.onFromAccountIdChanged?.call(id);
                     },
-                    // selectedValue: selectedStatus,
-                    // items: items,
-                    // onChanged: (val) => setState(() => selectedStatus = val),
                   ),
                 ),
                 const SizedBox(height: 10),
               ],
 
               if (widget.config.showToAccount) ...[
-                // الحساب المستقبِل (هنا يظهر فقط في الإيداع/التحويل)
+               
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -176,7 +175,9 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
                     hint: "اختر الحساب الذي تريد التحويل اليه",
                     suffixIcon: Icons.edit,
                     keyboardType: TextInputType.text,
-                    onChanged: (value) {},
+                    onChanged: (value) {
+                      widget.onToAccountNumberChanged?.call(value);
+                    },
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -194,7 +195,7 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
                     suffixIcon: Icons.credit_card_outlined,
                     keyboardType: TextInputType.number,
                     onChanged: (value) {
-                      widget.onAmountChanged?.call(value); // ✅ السطر الوحيد
+                      widget.onAmountChanged?.call(value); 
                     },
                   ),
                 ),

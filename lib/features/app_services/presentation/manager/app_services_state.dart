@@ -24,7 +24,8 @@ class AppServicesState extends Equatable {
   // ✅ فلاج نجاح مرة واحدة (ليسكر البوتم شيت بالـ Listener)
   final bool withdrawSuccess;
   final String amountChanged;
-
+  final String toAccountNumberChanged; // ✅ NEW
+  final bool transferSuccess;
   const AppServicesState({
     this.status = AppServicesStatus.initial,
     this.accountsForSelect = const [],
@@ -38,6 +39,8 @@ class AppServicesState extends Equatable {
 
     this.withdrawSuccess = false,
     this.depositSuccess = false,
+    this.toAccountNumberChanged = '',
+    this.transferSuccess = false,
   });
 
   bool get hasAccounts => accountsForSelect.isNotEmpty;
@@ -54,6 +57,8 @@ class AppServicesState extends Equatable {
     String? amountChanged,
     bool? withdrawSuccess,
     bool? depositSuccess,
+     String? toAccountNumberChanged,
+    bool? transferSuccess,
   }) {
     return AppServicesState(
       status: status ?? this.status,
@@ -68,6 +73,8 @@ class AppServicesState extends Equatable {
       amountChanged: amountChanged ?? this.amountChanged,
       withdrawSuccess: withdrawSuccess ?? this.withdrawSuccess,
       depositSuccess: depositSuccess ?? this.depositSuccess,
+      toAccountNumberChanged: toAccountNumberChanged ?? this.toAccountNumberChanged,
+      transferSuccess: transferSuccess ?? this.transferSuccess,
     );
   }
 
@@ -83,5 +90,7 @@ class AppServicesState extends Equatable {
     operationNameChanged,
     withdrawSuccess,
     depositSuccess,
+    toAccountNumberChanged,
+    transferSuccess,
   ];
 }

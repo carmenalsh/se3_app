@@ -3,6 +3,7 @@ enum OperationType {
   deposit, // إيداع
   transfer, // تحويل
   editAccount,
+  download,
 }
 
 class OperationConfig {
@@ -14,7 +15,8 @@ class OperationConfig {
   final bool showAccountName;
   final bool showAccountState;
   final bool showAccountDescription;
-
+  final bool showSelectFileType;
+  final bool showChoosePeriod;
   const OperationConfig({
     required this.title,
     this.showFromAccount = false,
@@ -24,6 +26,8 @@ class OperationConfig {
     this.showAccountDescription = false,
     this.showAccountName = false,
     this.showAccountState = false,
+    this.showSelectFileType = false,
+    this.showChoosePeriod = false,
   });
 }
 
@@ -47,10 +51,16 @@ const operationConfigs = {
     operayionAddress: true,
     showAmount: true,
   ),
-  OperationType.editAccount:OperationConfig(
+  OperationType.editAccount: OperationConfig(
     title: 'تعديل الحساب',
     showAccountName: true,
     showAccountState: true,
     showAccountDescription: true,
-    )
+  ),
+  OperationType.download: OperationConfig(
+    title: 'تحميل ملف',
+    showFromAccount: true,
+    showChoosePeriod: true,
+    showSelectFileType: true,
+  ),
 };
