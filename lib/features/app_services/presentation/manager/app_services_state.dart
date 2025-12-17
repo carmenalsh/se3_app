@@ -12,25 +12,30 @@ class AppServicesState extends Equatable {
   // ✅ اختيار المستخدم (من الدروب داون)
   final int? selectedFromAccountId;
   final String? selectedFromAccountName;
+  final String? selectedOperationType;
+  final String? sectectDate;
 
   // ✅ للـ loading
   final bool isSubmitting;
+
   final bool depositSuccess;
+  final bool withdrawSuccess;
+  final bool transferSuccess;
+  final bool scheduledSuccess;
 
   final String? message;
 
   final String operationNameChanged;
-
-  // ✅ فلاج نجاح مرة واحدة (ليسكر البوتم شيت بالـ Listener)
-  final bool withdrawSuccess;
   final String amountChanged;
-  final String toAccountNumberChanged; // ✅ NEW
-  final bool transferSuccess;
+  final String toAccountNumberChanged;
+
   const AppServicesState({
     this.status = AppServicesStatus.initial,
     this.accountsForSelect = const [],
     this.selectedFromAccountId,
     this.selectedFromAccountName,
+    this.selectedOperationType,
+    this.sectectDate,
     this.isSubmitting = false,
 
     this.message,
@@ -39,6 +44,7 @@ class AppServicesState extends Equatable {
 
     this.withdrawSuccess = false,
     this.depositSuccess = false,
+    this.scheduledSuccess = false,
     this.toAccountNumberChanged = '',
     this.transferSuccess = false,
   });
@@ -57,8 +63,11 @@ class AppServicesState extends Equatable {
     String? amountChanged,
     bool? withdrawSuccess,
     bool? depositSuccess,
-     String? toAccountNumberChanged,
+    String? toAccountNumberChanged,
     bool? transferSuccess,
+    String? sectectDate,
+    String? selectedOperationType,
+    bool? scheduledSuccess,
   }) {
     return AppServicesState(
       status: status ?? this.status,
@@ -73,8 +82,14 @@ class AppServicesState extends Equatable {
       amountChanged: amountChanged ?? this.amountChanged,
       withdrawSuccess: withdrawSuccess ?? this.withdrawSuccess,
       depositSuccess: depositSuccess ?? this.depositSuccess,
-      toAccountNumberChanged: toAccountNumberChanged ?? this.toAccountNumberChanged,
+      toAccountNumberChanged:
+          toAccountNumberChanged ?? this.toAccountNumberChanged,
       transferSuccess: transferSuccess ?? this.transferSuccess,
+      sectectDate: sectectDate ?? this.sectectDate,
+      selectedOperationType: selectedOperationType ?? this.selectedOperationType,
+      scheduledSuccess: scheduledSuccess ?? this.scheduledSuccess,
+
+
     );
   }
 
@@ -92,5 +107,8 @@ class AppServicesState extends Equatable {
     depositSuccess,
     toAccountNumberChanged,
     transferSuccess,
+    selectedOperationType,
+    sectectDate,
+    scheduledSuccess,
   ];
 }

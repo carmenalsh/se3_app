@@ -145,6 +145,7 @@ class AppServicesPage extends StatelessWidget {
       );
       return;
     }
+   
 
     final names = accounts.map((e) => e.name).toList();
     final map = {for (final a in accounts) a.name: a.id};
@@ -165,7 +166,10 @@ class AppServicesPage extends StatelessWidget {
             ).showSnackBar(SnackBar(content: Text(st.message!)));
 
             final success =
-                st.withdrawSuccess || st.depositSuccess || st.transferSuccess;
+                st.withdrawSuccess ||
+                st.depositSuccess ||
+                st.transferSuccess ||
+                st.scheduledSuccess;
 
             if (success) {
               // ✅ 2) سكّر البوتم شيت + ارجع true
@@ -175,6 +179,7 @@ class AppServicesPage extends StatelessWidget {
               if (st.withdrawSuccess) cubit.resetWithdrawSuccess();
               if (st.depositSuccess) cubit.resetDepositSuccess();
               if (st.transferSuccess) cubit.resetTransferSuccess();
+              if (st.scheduledSuccess) cubit.resetScheduledSuccess();
             }
           },
 
@@ -191,10 +196,18 @@ class AppServicesPage extends StatelessWidget {
                 onToAccountNumberChanged: (type == OperationType.transfer)
                     ? cubit.toAccountNumberChanged
                     : null,
+                onScheduledTypeChanged: (type == OperationType.scheduled)
+                    ? cubit.scheduledTypeChanged
+                    : null,
+                onScheduledAtChanged: (type == OperationType.scheduled)
+                    ? cubit.scheduledDateChanged
+                    : null,
+
                 onSubmit: () {
                   if (type == OperationType.withdraw) cubit.submitWithdraw();
                   if (type == OperationType.deposit) cubit.submitDeposit();
                   if (type == OperationType.transfer) cubit.submitTransfer();
+                  if (type == OperationType.scheduled) cubit.submitScheduled();
                 },
               );
             },
@@ -317,9 +330,9 @@ class AppServicesPage extends StatelessWidget {
                         SizedBox(width: 28),
                         InkWell(
                           onTap: () => _openOperationWithAccounts(
-          context,
-          type: OperationType.scheduled,
-        ),
+                            context,
+                            type: OperationType.scheduled,
+                          ),
 
                           child: ComplaintInformationWidget(
                             titleColor: AppColor.black,

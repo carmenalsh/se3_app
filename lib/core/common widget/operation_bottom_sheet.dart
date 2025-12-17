@@ -27,8 +27,8 @@ class OperationBottomSheet extends StatefulWidget {
   final ValueChanged<String>? onToAccountNumberChanged;
   final ValueChanged<String>? onFileTypeChanged;
   final ValueChanged<String>? onPeriodChanged;
-  final ValueChanged<String>? onScheduledTypeChanged;   // "إيداع" | "سحب"
-final ValueChanged<String>? onScheduledAtChanged;
+  final ValueChanged<String>? onScheduledTypeChanged; // "إيداع" | "سحب"
+  final ValueChanged<String>? onScheduledAtChanged;
 
   final Map<String, int> nameToId;
   final ValueChanged<int?>? onFromAccountIdChanged;
@@ -66,14 +66,14 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
   int? selectedFromAccountId;
   String? selectedFileType; // 'pdf' | 'csv'
   String? selectedPeriod;
-String? selectedScheduledType;      // "إيداع" | "سحب"
-DateTime? selectedScheduledDateTime;
-String? scheduledAtFormatted;  
+  String? selectedScheduledType; // "إيداع" | "سحب"
+  DateTime? selectedScheduledDateTime;
+  String? scheduledAtFormatted;
   late final TextEditingController nameController;
   late final TextEditingController descController;
-String _formatDateTime(DateTime dt) {
-  return DateFormat('yyyy-MM-dd HH:mm:ss').format(dt);
-}
+  String _formatDateTime(DateTime dt) {
+    return DateFormat('yyyy-MM-dd HH:mm:ss').format(dt);
+  }
 
   // AccountItem? selected;
   @override
@@ -82,15 +82,15 @@ String _formatDateTime(DateTime dt) {
     selectedStatus = widget.initialStatus;
     selectedFileType = 'pdf';
     selectedPeriod = 'month';
-    selectedScheduledType = "إيداع";
-  selectedScheduledDateTime = DateTime.now().add(const Duration(minutes: 5));
+    selectedScheduledType = "ايداع";
+    selectedScheduledDateTime = DateTime.now().add(const Duration(minutes: 5));
 
-  scheduledAtFormatted = _formatDateTime(selectedScheduledDateTime!);
+    scheduledAtFormatted = _formatDateTime(selectedScheduledDateTime!);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.onFileTypeChanged?.call(selectedFileType!);
       widget.onPeriodChanged?.call(selectedPeriod!);
       widget.onScheduledTypeChanged?.call(selectedScheduledType!);
-    widget.onScheduledAtChanged?.call(scheduledAtFormatted!);
+      widget.onScheduledAtChanged?.call(scheduledAtFormatted!);
     });
 
     nameController = TextEditingController(
@@ -99,6 +99,17 @@ String _formatDateTime(DateTime dt) {
     descController = TextEditingController(
       text: widget.initialDescription ?? '',
     );
+     if (widget.config.selectTypeTransActioToScheduled) {
+    selectedScheduledType ??= 'إيداع';
+    widget.onScheduledTypeChanged?.call(selectedScheduledType!);
+  }
+
+  if (widget.config.showCelender) {
+    final dt = DateTime.now().add(const Duration(minutes: 5));
+    selectedScheduledDateTime ??= dt;
+    scheduledAtFormatted ??= _formatDateTime(dt);
+    widget.onScheduledAtChanged?.call(scheduledAtFormatted!);
+  }
   }
 
   @override
@@ -147,7 +158,7 @@ String _formatDateTime(DateTime dt) {
             const SizedBox(height: 8),
             Divider(thickness: 2, color: AppColor.lightgrey),
             const SizedBox(height: 3),
-    
+
             if (widget.config.operayionAddress) ...[
               // عنوان العملية
               Padding(
@@ -166,7 +177,7 @@ String _formatDateTime(DateTime dt) {
               ),
               const SizedBox(height: 10),
             ],
-    
+
             if (widget.config.showFromAccount) ...[
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -179,7 +190,7 @@ String _formatDateTime(DateTime dt) {
                   items: items,
                   onChanged: (val) {
                     setState(() => selectedFromAccountName = val);
-    
+
                     final id = (val == null) ? null : widget.nameToId[val];
                     selectedFromAccountId = id;
                     widget.onFromAccountIdChanged?.call(id);
@@ -188,7 +199,7 @@ String _formatDateTime(DateTime dt) {
               ),
               const SizedBox(height: 10),
             ],
-    
+
             if (widget.config.showToAccount) ...[
               Padding(
                 padding: const EdgeInsets.symmetric(
@@ -207,7 +218,7 @@ String _formatDateTime(DateTime dt) {
               ),
               const SizedBox(height: 10),
             ],
-    
+
             if (widget.config.showAmount) ...[
               Padding(
                 padding: const EdgeInsets.symmetric(
@@ -226,7 +237,7 @@ String _formatDateTime(DateTime dt) {
               ),
               const SizedBox(height: 35),
             ],
-    
+
             if (widget.config.showAccountName) ...[
               Padding(
                 padding: const EdgeInsets.symmetric(
@@ -277,7 +288,7 @@ String _formatDateTime(DateTime dt) {
                   hint: "ادخل وصفا للحساب الخاص بك للتعديل...",
                   suffixIcon: Icons.layers_outlined,
                   keyboardType: TextInputType.text,
-    
+
                   onChanged: (v) => widget.onDescriptionChanged?.call(v),
                 ),
               ),
@@ -303,8 +314,7 @@ String _formatDateTime(DateTime dt) {
                             groupValue: selectedFileType,
                             onChanged: (v) {
                               setState(() => selectedFileType = v);
-                              if (v != null)
-                                widget.onFileTypeChanged?.call(v);
+                              if (v != null) widget.onFileTypeChanged?.call(v);
                             },
                             title: const CustomTextWidget(
                               'PDF',
@@ -321,8 +331,7 @@ String _formatDateTime(DateTime dt) {
                             groupValue: selectedFileType,
                             onChanged: (v) {
                               setState(() => selectedFileType = v);
-                              if (v != null)
-                                widget.onFileTypeChanged?.call(v);
+                              if (v != null) widget.onFileTypeChanged?.call(v);
                             },
                             title: const CustomTextWidget(
                               'CSV',
@@ -340,7 +349,7 @@ String _formatDateTime(DateTime dt) {
               ),
               const SizedBox(height: 10),
             ],
-    
+
             if (widget.config.showChoosePeriod) ...[
               const SizedBox(height: 6),
               Padding(
@@ -375,7 +384,7 @@ String _formatDateTime(DateTime dt) {
                         setState(() => selectedPeriod = v);
                         if (v != null) widget.onPeriodChanged?.call(v);
                       },
-    
+
                       title: CustomTextWidget(
                         'شهر',
                         color: AppColor.middleGrey,
@@ -405,157 +414,167 @@ String _formatDateTime(DateTime dt) {
               const SizedBox(height: 10),
             ],
             if (widget.config.selectTypeTransActioToScheduled) ...[
-      const SizedBox(height: 10),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      CustomTextWidget(
-        "نوع المعاملة",
-        fontSize: SizeConfig.diagonal * .032,
-        color: AppColor.textColor,
-      ),
-      Row(
-        children: [
-          Expanded(
-            child: RadioListTile<String>(
-              value: 'إيداع',
-              groupValue: selectedScheduledType,
-              onChanged: (v) {
-                setState(() => selectedScheduledType = v);
-                if (v != null) widget.onScheduledTypeChanged?.call(v);
-              },
-              title: const CustomTextWidget(
-                'إيداع',
-                color: AppColor.middleGrey,
-                textAlign: TextAlign.right,
-              ),
-              dense: true,
-              contentPadding: EdgeInsets.zero,
-            ),
-          ),
-          Expanded(
-            child: RadioListTile<String>(
-              value: 'سحب',
-              groupValue: selectedScheduledType,
-              onChanged: (v) {
-                setState(() => selectedScheduledType = v);
-                if (v != null) widget.onScheduledTypeChanged?.call(v);
-              },
-              title: const CustomTextWidget(
-                'سحب',
-                color: AppColor.middleGrey,
-                textAlign: TextAlign.right,
-              ),
-              dense: true,
-              contentPadding: EdgeInsets.zero,
-            ),
-          ),
-        ],
-      ),
-    ],
-        ),
-      ),
-      const SizedBox(height: 10),
-    ],
-    
-            if (widget.config.showCelender) ...[
-      const SizedBox(height: 6),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      CustomTextWidget(
-        "تاريخ ووقت التنفيذ",
-        fontSize: SizeConfig.diagonal * .032,
-        color: AppColor.textColor,
-      ),
-      const SizedBox(height: 8),
-    
-      InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () async {
-          final now = DateTime.now();
-          final initial = selectedScheduledDateTime ?? now;
-    
-          final date = await showDatePicker(
-            context: context,
-            initialDate: initial,
-            firstDate: now,
-            lastDate: DateTime(now.year + 10),
-          );
-          if (date == null) return;
-    
-          final time = await showTimePicker(
-            context: context,
-            initialTime: TimeOfDay.fromDateTime(initial),
-          );
-          if (time == null) return;
-    
-          final dt = DateTime(
-            date.year,
-            date.month,
-            date.day,
-            time.hour,
-            time.minute,
-            0,
-          );
-    
-          setState(() {
-            selectedScheduledDateTime = dt;
-            scheduledAtFormatted = _formatDateTime(dt);
-          });
-    
-          widget.onScheduledAtChanged?.call(scheduledAtFormatted!);
-        },
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColor.lightgrey),
-            color: Colors.white,
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.calendar_month_outlined, color: AppColor.middleGrey),
-              const SizedBox(width: 10),
-              Expanded(
-                child: CustomTextWidget(
-                  scheduledAtFormatted ?? 'اختر التاريخ والوقت',
-                  color: AppColor.middleGrey,
-                  textAlign: TextAlign.right,
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CustomTextWidget(
+                      "نوع المعاملة",
+                      fontSize: SizeConfig.diagonal * .032,
+                      color: AppColor.textColor,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: RadioListTile<String>(
+                            value: 'ايداع',
+                            groupValue: selectedScheduledType,
+                            onChanged: (v) {
+                              setState(() => selectedScheduledType = v);
+                              if (v != null)
+                                widget.onScheduledTypeChanged?.call(v);
+                            },
+                            title: const CustomTextWidget(
+                              'ايداع',
+                              color: AppColor.middleGrey,
+                              textAlign: TextAlign.right,
+                            ),
+                            dense: true,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                        ),
+                        Expanded(
+                          child: RadioListTile<String>(
+                            value: 'سحب',
+                            groupValue: selectedScheduledType,
+                            onChanged: (v) {
+                              setState(() => selectedScheduledType = v);
+                              if (v != null)
+                                widget.onScheduledTypeChanged?.call(v);
+                            },
+                            title: const CustomTextWidget(
+                              'سحب',
+                              color: AppColor.middleGrey,
+                              textAlign: TextAlign.right,
+                            ),
+                            dense: true,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
+              const SizedBox(height: 10),
             ],
-          ),
-        ),
-      ),
-    ],
-        ),
-      ),
-      const SizedBox(height: 12),
-    ],
-    
+
+            if (widget.config.showCelender) ...[
+              const SizedBox(height: 6),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CustomTextWidget(
+                      "تاريخ ووقت التنفيذ",
+                      fontSize: SizeConfig.diagonal * .032,
+                      color: AppColor.textColor,
+                    ),
+                    const SizedBox(height: 8),
+
+                    InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () async {
+                        final now = DateTime.now();
+                        final initial = selectedScheduledDateTime ?? now;
+
+                        final date = await showDatePicker(
+                          context: context,
+                          initialDate: initial,
+                          firstDate: now,
+                          lastDate: DateTime(now.year + 10),
+                        );
+                        if (date == null) return;
+
+                        final time = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.fromDateTime(initial),
+                        );
+                        if (time == null) return;
+
+                        final dt = DateTime(
+                          date.year,
+                          date.month,
+                          date.day,
+                          time.hour,
+                          time.minute,
+                          0,
+                        );
+
+                        setState(() {
+                          selectedScheduledDateTime = dt;
+                          scheduledAtFormatted = _formatDateTime(dt);
+                        });
+
+                        widget.onScheduledAtChanged?.call(
+                          scheduledAtFormatted!,
+                        );
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 14,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColor.lightgrey),
+                          color: Colors.white,
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.calendar_month_outlined,
+                              color: AppColor.middleGrey,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: CustomTextWidget(
+                                scheduledAtFormatted ?? 'اختر التاريخ والوقت',
+                                color: AppColor.middleGrey,
+                                textAlign: TextAlign.right,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
+
             CustomButtonWidget(
               width: double.infinity,
               backgroundColor: AppColor.primary,
               childHorizontalPad: SizeConfig.width * .07,
               childVerticalPad: SizeConfig.height * .012,
               borderRadius: 10,
-    
+
               // onTap: () {
               //   final cubit = context.read<AccountManagCubit>();
-    
+
               //   // ✅ منع الإرسال مرتين
               //   // if (cubit.state.isSubmitting) return;
-    
+
               //   final name = nameController.text.trim();
               //   final desc = descController.text.trim();
               //   final status = selectedStatus?.trim();
-    
+
               //   // ✅ Validation بسيطة
               //   if (name.isEmpty) {
               //     // إذا بدك سناكبار سريع بدل state message:
@@ -564,19 +583,19 @@ String _formatDateTime(DateTime dt) {
               //     );
               //     return;
               //   }
-    
+
               //   if (status == null || status.isEmpty) {
               //     ScaffoldMessenger.of(context).showSnackBar(
               //       const SnackBar(content: Text('اختر حالة الحساب')),
               //     );
               //     return;
               //   }
-    
+
               //   // ✅ خزّن القيم بالـ Cubit
               //   cubit.editNameChanged(name);
               //   cubit.editDescriptionChanged(desc);
               //   cubit.editStatusChanged(status);
-    
+
               //   // ✅ Debug: شو عم ينبعت بالضبط
               //   debugPrint(
               //     "============ BottomSheet Submit UpdateAccount ============",
@@ -587,7 +606,7 @@ String _formatDateTime(DateTime dt) {
               //   debugPrint(
               //     "=========================================================",
               //   );
-    
+
               //   // ✅ نفّذ
               //   cubit.submitUpdateAccount();
               // },

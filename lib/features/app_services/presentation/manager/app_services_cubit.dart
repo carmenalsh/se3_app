@@ -1,11 +1,12 @@
 import 'package:complaints_app/features/app_services/domain/use_case/deposit_use_case.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/get_accounts_for_select_use_case.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/params/deposit_params.dart';
+import 'package:complaints_app/features/app_services/domain/use_case/params/scheduled_params.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/params/transfer_params.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/params/withdraw_params.dart';
+import 'package:complaints_app/features/app_services/domain/use_case/scheduled_use_case.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/transfer_use_case.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/withdraw_use_case.dart';
-import 'package:complaints_app/features/auth/domain/use_cases/logout_use_case.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'app_services_state.dart';
@@ -15,11 +16,13 @@ class AppServicesCubit extends Cubit<AppServicesState> {
   final WithdrawUseCase withdrawUseCase;
   final DepositUseCase depositUseCase;
   final TransferUseCase transferUseCase;
+  final ScheduledUseCase scheduledUseCase;
   AppServicesCubit({
     required this.getAccountsForSelectUseCase,
     required this.withdrawUseCase,
     required this.depositUseCase,
     required this.transferUseCase,
+    required this.scheduledUseCase,
   }) : super(const AppServicesState());
 
   /// تحميل قائمة الحسابات (للاستخدام في السحب/الإيداع...)
@@ -190,6 +193,70 @@ class AppServicesCubit extends Cubit<AppServicesState> {
     debugPrint("=================================================");
   }
 
+  Future<void> submitScheduled() async {
+    debugPrint("============ AppServicesCubit.submitScheduled ============");
+
+    if (state.isSubmitting) return;
+    final fromAccountId = state.selectedFromAccountId;
+    final selectedOperationType = state.selectedOperationType;
+    final selectedDate = state.sectectDate;
+    final amount = state.amountChanged.trim();
+    final name = state.operationNameChanged.trim();
+    if (fromAccountId == null) {
+      emit(state.copyWith(message: "اختر الحساب", clearMessage: false));
+      return;
+    }
+    if (name.isEmpty) {
+      emit(state.copyWith(message: "اكتب عنوان العملية", clearMessage: false));
+      return;
+    }
+    if (amount.isEmpty) {
+      emit(state.copyWith(message: "ادخل المبلغ", clearMessage: false));
+      return;
+    }
+    if (selectedOperationType == null) {
+      emit(state.copyWith(message: "اختر نوع العملية", clearMessage: false));
+      return;
+    }
+    if (selectedDate == null) {
+      emit(state.copyWith(message: "الرجاء حدد التاريخ", clearMessage: false));
+      return;
+    }
+    emit(
+      state.copyWith(
+        isSubmitting: true,
+        scheduledSuccess: false,
+        clearMessage: true,
+      ),
+    );
+    final params = ScheduledParams(
+      accountId: fromAccountId,
+      type: selectedOperationType,
+      amount: amount,
+      scheduledAt: selectedDate,
+      name: name,
+    );
+    final result = await scheduledUseCase.call(params);
+    result.fold(
+      (failure) {
+        debugPrint("✗ submitScheduled failed: ${failure.errMessage}");
+        emit(state.copyWith(isSubmitting: false, message: failure.errMessage));
+      },
+      (success) {
+        debugPrint("✓ submitScheduled success: ${success.successMessage}");
+        emit(
+          state.copyWith(
+            isSubmitting: false,
+            message: success.successMessage,
+            scheduledSuccess: true,
+          ),
+        );
+      },
+    );
+
+    debugPrint("=================================================");
+  }
+
   Future<void> submitTransfer() async {
     debugPrint("============ AppServicesCubit.submitTransfer ============");
 
@@ -212,6 +279,7 @@ class AppServicesCubit extends Cubit<AppServicesState> {
       emit(state.copyWith(message: "ادخل المبلغ", clearMessage: false));
       return;
     }
+
     if (toAccountNumber.isEmpty) {
       emit(
         state.copyWith(
@@ -276,6 +344,14 @@ class AppServicesCubit extends Cubit<AppServicesState> {
   void amountChanged(String value) {
     emit(state.copyWith(amountChanged: value));
   }
+  void scheduledTypeChanged(String v) {
+  emit(state.copyWith(selectedOperationType: v));
+}
+
+void scheduledDateChanged(String v) {
+  emit(state.copyWith(sectectDate: v));
+}
+
 
   void resetWithdrawSuccess() {
     if (!state.withdrawSuccess) return;
@@ -294,5 +370,10 @@ class AppServicesCubit extends Cubit<AppServicesState> {
   void resetTransferSuccess() {
     if (!state.transferSuccess) return;
     emit(state.copyWith(transferSuccess: false));
+  }
+
+  void resetScheduledSuccess() {
+    if (!state.scheduledSuccess) return;
+    emit(state.copyWith(scheduledSuccess: false));
   }
 }

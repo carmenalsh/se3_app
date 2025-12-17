@@ -12,6 +12,7 @@ import 'package:complaints_app/features/app_services/data/data_source/app_servic
 import 'package:complaints_app/features/app_services/data/repository_impl/app_services_repository_impl.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/deposit_use_case.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/get_accounts_for_select_use_case.dart';
+import 'package:complaints_app/features/app_services/domain/use_case/scheduled_use_case.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/transfer_use_case.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/withdraw_use_case.dart';
 import 'package:complaints_app/features/app_services/presentation/manager/app_services_cubit.dart';
@@ -404,6 +405,8 @@ abstract class AppRourer {
           final withdrawUseCase = WithdrawUseCase(repository: repository);
           final depositUseCase = DepositUseCase(repository: repository);
           final transferUseCase = TransferUseCase(repository: repository);
+          final scheduledUseCase = ScheduledUseCase(repository: repository);
+
           final connectionChecker = InternetConnectionChecker.createInstance();
           final networkInfo = NetworkInfoImpl(connectionChecker);
          final authRemoreDataSourcev = AuthRemoteDataSourceImpl(
@@ -421,7 +424,8 @@ abstract class AppRourer {
                   getAccountsForSelectUseCase: getAccounts,
                   withdrawUseCase: withdrawUseCase,
                   depositUseCase: depositUseCase,
-                  transferUseCase: transferUseCase,
+                  transferUseCase: transferUseCase, 
+                  scheduledUseCase: scheduledUseCase,
                  
                 ),
               ),
