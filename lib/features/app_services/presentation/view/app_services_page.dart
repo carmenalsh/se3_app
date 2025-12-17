@@ -1,103 +1,127 @@
+import 'dart:io';
+
 import 'package:complaints_app/core/common%20widget/custom_app_bar.dart';
 import 'package:complaints_app/core/common%20widget/operation_bottom_sheet.dart';
+import 'package:complaints_app/core/databases/api/dio_consumer.dart';
 import 'package:complaints_app/core/enums/operation_type.dart';
 import 'package:complaints_app/core/theme/assets/images.dart';
 import 'package:complaints_app/core/theme/color/app_color.dart';
+import 'package:complaints_app/features/app_services/data/data_source/download_file_remote_data_source.dart';
+import 'package:complaints_app/features/app_services/data/repository_impl/download_file_repository_impl.dart';
+import 'package:complaints_app/features/app_services/domain/use_case/download_file_use_case.dart';
 import 'package:complaints_app/features/app_services/presentation/manager/app_services_cubit.dart';
 import 'package:complaints_app/features/app_services/presentation/manager/app_services_state.dart';
+import 'package:complaints_app/features/app_services/presentation/manager/download_manager/download_file_cubit.dart';
+import 'package:complaints_app/features/app_services/presentation/manager/download_manager/download_file_state.dart';
 import 'package:complaints_app/features/app_services/presentation/widget/divider_widget.dart';
 import 'package:complaints_app/features/app_services/presentation/widget/services_types.dart';
-import 'package:complaints_app/features/home/presentation/manager/home_cubit/home_cubit.dart';
+import 'package:complaints_app/features/auth/presentation/manager/logout_cubit/logout_cubit.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:open_filex/open_filex.dart';
 
 class AppServicesPage extends StatelessWidget {
   const AppServicesPage({super.key});
 
-  //   Future<void> _openOperationWithAccounts(
-  //     BuildContext context, {
-  //     required OperationType type,
-  //   }) async {
-  //     final cubit = context.read<AppServicesCubit>();
-  //     await cubit.loadAccountsForSelect();
+  Future<void> _openDownloadSheet(BuildContext context) async {
+    final appCubit = context.read<AppServicesCubit>();
 
-  //     final state = cubit.state;
+    await appCubit.loadAccountsForSelect();
 
-  //     if (state.status == AppServicesStatus.error && state.message != null) {
-  //       ScaffoldMessenger.of(
-  //         context,
-  //       ).showSnackBar(SnackBar(content: Text(state.message!)));
-  //       return;
-  //     }
+    final accounts = appCubit.state.accountsForSelect;
+    if (accounts.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('لا يوجد حسابات حالياً')));
+      return;
+    }
 
-  //     final accounts = state.accountsForSelect;
-  //     if (accounts.isEmpty) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         const SnackBar(content: Text('No accounts available right now')),
-  //       );
-  //       return;
-  //     }
+    final names = accounts.map((e) => e.name).toList();
+    final map = {for (final a in accounts) a.name: a.id};
 
-  //     final names = accounts.map((e) => e.name).toList();
-  //     final map = {for (final a in accounts) a.name: a.id};
+    final dioConsumer = DioConsumer(dio: Dio());
+    final remoteDataSource = DownloadFileRemoteDataSourceImpl(
+      dio: dioConsumer.dio,
+    );
+    final repository = DownloadFileRepositoryImpl(
+      remoteDataSource: remoteDataSource,
+    );
+    final downloadUseCase = DownloadFileUseCase(repository: repository);
 
-  //     final config = operationConfigs[type]!;
+    await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) {
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: appCubit), // لاختيار الحساب
+            BlocProvider(
+              create: (_) =>
+                  DownloadFileCubit(downloadFileUseCase: downloadUseCase),
+            ),
+          ],
+          child: Builder(
+            builder: (innerCtx) {
+              return BlocListener<DownloadFileCubit, DownloadFileState>(
+                listenWhen: (p, c) =>
+                    p.message != c.message && c.message != null,
+                listener: (ctx, st) async {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(st.message!)));
 
-  //     // showModalBottomSheet(
-  //     //   context: context,
-  //     //   isScrollControlled: true,
-  //     //   builder: (_) => OperationBottomSheet(
-  //     //     config: config,
-  //     //     dropdownItems: names,
-  //     //     nameToId: map,
-  //     //     isSubmitting: state.isSubmitting,
-  //         // onFromAccountIdChanged: cubit.fromAccountIdChanged,
-  //     //     onSubmit: () {
-  //     //       // TODO: connect submit action for this operation
-  //     //     },
-  //     //   ),
-  //     // );
-  //     showModalBottomSheet(
-  //   context: context,
-  //   isScrollControlled: true,
-  //   builder: (_) => BlocListener<AppServicesCubit, AppServicesState>(
-  //     listenWhen: (p, c) =>
-  //         p.message != c.message && c.message != null,
-  //     listener: (context, state) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text(state.message!)),
-  //       );
+                  if (st.downloadSuccess) {
+                    final path = st.savedFilePath;
 
-  //       // ✅ سكّر البوتم شيت عند نجاح السحب فقط
-  //       if (state.withdrawSuccess) {
-  //         Navigator.pop(context);
-  //         context.read<AppServicesCubit>().resetWithdrawSuccess();
-  //       }
-  //     },
-  //     child: OperationBottomSheet(
-  //       config: config,
-  //       dropdownItems: names,
-  //       nameToId: map,
-  //       isSubmitting: context.watch<AppServicesCubit>().state.isSubmitting,
+                    Navigator.pop(sheetContext, true);
+                    ctx.read<DownloadFileCubit>().resetSuccess();
 
-  //       // ✅ ربط الحساب
-  //       onFromAccountIdChanged: cubit.fromAccountIdChanged,
+                    // فتح الملف فقط إذا PDF
+                    final selectedType = ctx
+                        .read<DownloadFileCubit>()
+                        .state
+                        .selectedFileType;
+                    if (path != null && selectedType == 'pdf') {
+                      final exists = await File(path).exists();
+                      if (exists) {
+                        await OpenFilex.open(path);
+                      }
+                    }
+                  }
+                },
+                child: OperationBottomSheet(
+                  config: operationConfigs[OperationType.download]!,
+                  dropdownItems: names,
+                  nameToId: map,
 
-  //       // ✅ ربط اسم العملية
-  //       onOperationNameChanged: cubit.withdrawNameChanged,
+                  // ✅ هون صار context تحت الـ Provider
+                  isSubmitting: innerCtx
+                      .watch<DownloadFileCubit>()
+                      .state
+                      .isSubmitting,
 
-  //       // ✅ ربط المبلغ
-  //       onAmountChanged: cubit.withdrawAmountChanged,
+                  onFromAccountIdChanged: appCubit.fromAccountIdChanged,
 
-  //       // ✅ زر الإرسال (سحب فقط)
-  //       onSubmit: () {
-  //         cubit.submitWithdraw();
-  //       },
-  //     ),
-  //   ),
-  // );
+                  onFileTypeChanged: (v) =>
+                      innerCtx.read<DownloadFileCubit>().fileTypeChanged(v),
 
-  //   }
+                  onPeriodChanged: (v) =>
+                      innerCtx.read<DownloadFileCubit>().periodChanged(v),
+
+                  onSubmit: () =>
+                      innerCtx.read<DownloadFileCubit>().submitDownload(
+                        accountId: appCubit.state.selectedFromAccountId,
+                      ),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> _openOperationWithAccounts(
     BuildContext context, {
     required OperationType type,
@@ -231,19 +255,6 @@ class AppServicesPage extends StatelessWidget {
                           DividerWidget(),
                           SizedBox(width: 25),
                           InkWell(
-                            // onTap: () {
-                            //   final config =
-                            //       operationConfigs[OperationType.transfer]!;
-                            //   showModalBottomSheet(
-                            //     context: context,
-                            //     isScrollControlled: true,
-                            //     builder: (_) => OperationBottomSheet(
-                            //       config: config,
-                            //       isSubmitting: false,
-                            //       onSubmit: () {},
-                            //     ),
-                            //   );
-                            // },
                             onTap: () => _openOperationWithAccounts(
                               context,
                               type: OperationType.transfer,
@@ -264,10 +275,14 @@ class AppServicesPage extends StatelessWidget {
                     child: Row(
                       children: [
                         SizedBox(width: 30),
-                        ComplaintInformationWidget(
-                          titleColor: AppColor.black,
-                          image: AppImage.generateFile,
-                          title: "توليد ملف",
+                        InkWell(
+                          onTap: () => _openDownloadSheet(context),
+
+                          child: ComplaintInformationWidget(
+                            titleColor: AppColor.black,
+                            image: AppImage.generateFile,
+                            title: "توليد ملف",
+                          ),
                         ),
                         SizedBox(width: 16),
                         DividerWidget(),
@@ -280,10 +295,16 @@ class AppServicesPage extends StatelessWidget {
                         SizedBox(width: 24),
                         DividerWidget(),
                         SizedBox(width: 12),
-                        ComplaintInformationWidget(
-                          titleColor: AppColor.black,
-                          image: AppImage.logout,
-                          title: "تسجيل خروج",
+                        InkWell(
+                          onTap: () {
+                            debugPrint("loggg outtttt");
+                            context.read<LogoutCubit>().logOutSubmitted();
+                          },
+                          child: ComplaintInformationWidget(
+                            titleColor: AppColor.black,
+                            image: AppImage.logout,
+                            title: "تسجيل خروج",
+                          ),
                         ),
                       ],
                     ),
@@ -294,10 +315,17 @@ class AppServicesPage extends StatelessWidget {
                     child: Row(
                       children: [
                         SizedBox(width: 28),
-                        ComplaintInformationWidget(
-                          titleColor: AppColor.black,
-                          image: AppImage.scheduling,
-                          title: "جدولة",
+                        InkWell(
+                          onTap: () => _openOperationWithAccounts(
+          context,
+          type: OperationType.scheduled,
+        ),
+
+                          child: ComplaintInformationWidget(
+                            titleColor: AppColor.black,
+                            image: AppImage.scheduling,
+                            title: "جدولة",
+                          ),
                         ),
                         SizedBox(width: 36),
                         DividerWidget(),

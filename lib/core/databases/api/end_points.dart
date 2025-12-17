@@ -31,6 +31,10 @@ class EndPoints {
   static const String withdraw  = 'citizen/services/withdraw';
   static const String deposit  = 'citizen/services/deposit';
   static const String transfer  = 'citizen/services/transfer';
+  static const String downloadFile  = 'citizen/services/download';
+  static const String scheduled  = 'citizen/services/scheduled';
+
+
 
   // submit a complaint
   static const String getAccounts = 'citizen/Account/index';

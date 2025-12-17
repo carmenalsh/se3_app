@@ -4,6 +4,7 @@ enum OperationType {
   transfer, // تحويل
   editAccount,
   download,
+  scheduled,
 }
 
 class OperationConfig {
@@ -17,6 +18,8 @@ class OperationConfig {
   final bool showAccountDescription;
   final bool showSelectFileType;
   final bool showChoosePeriod;
+  final bool showCelender;
+  final bool selectTypeTransActioToScheduled;
   const OperationConfig({
     required this.title,
     this.showFromAccount = false,
@@ -28,6 +31,8 @@ class OperationConfig {
     this.showAccountState = false,
     this.showSelectFileType = false,
     this.showChoosePeriod = false,
+    this.selectTypeTransActioToScheduled = false,
+    this.showCelender = false,
   });
 }
 
@@ -58,9 +63,17 @@ const operationConfigs = {
     showAccountDescription: true,
   ),
   OperationType.download: OperationConfig(
-    title: 'تحميل ملف',
+    title: 'توليد ملف',
     showFromAccount: true,
     showChoosePeriod: true,
     showSelectFileType: true,
+  ),
+  OperationType.scheduled: OperationConfig(
+    title: "جدولة معاملة",
+    showFromAccount: true,
+    operayionAddress: true,
+    showCelender: true,
+    selectTypeTransActioToScheduled: true,
+    showAmount: true,
   ),
 };

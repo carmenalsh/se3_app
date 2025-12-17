@@ -45,8 +45,6 @@ import 'package:complaints_app/features/create_account/presentation/view/create_
 import 'package:complaints_app/features/home/data/data_sources/home_remote_data_source.dart';
 import 'package:complaints_app/features/home/data/repository_impl/home_repository_impl.dart';
 import 'package:complaints_app/features/home/domain/use_cases/get_transaction_use_case.dart';
-import 'package:complaints_app/features/home/domain/use_cases/get_notifications_use_case.dart';
-import 'package:complaints_app/features/home/domain/use_cases/search_complaint_use_case.dart';
 import 'package:complaints_app/features/home/presentation/manager/home_cubit/home_cubit.dart';
 import 'package:complaints_app/features/home/presentation/screens/home_view.dart';
 import 'package:complaints_app/features/splash%20and%20welcome/presentation/views/splash_view.dart';
@@ -327,7 +325,7 @@ abstract class AppRourer {
             remoteDataSource: authRemoreDataSourcev,
             networkInfo: networkInfo,
           );
-          final logoutUseCase = LogoutUseCase(repository: authRepository);
+         // final logoutUseCase = LogoutUseCase(repository: authRepository);
 
           // final notificationUseCase = GetNotificationsUseCase(
           //   repository: homeRepository,
@@ -406,16 +404,29 @@ abstract class AppRourer {
           final withdrawUseCase = WithdrawUseCase(repository: repository);
           final depositUseCase = DepositUseCase(repository: repository);
           final transferUseCase = TransferUseCase(repository: repository);
+          final connectionChecker = InternetConnectionChecker.createInstance();
+          final networkInfo = NetworkInfoImpl(connectionChecker);
+         final authRemoreDataSourcev = AuthRemoteDataSourceImpl(
+            apiConsumer: api,
+          );
+          final authRepository = AuthRepositoryImpl(
+            remoteDataSource: authRemoreDataSourcev,
+            networkInfo: networkInfo,
+          );
+          final logoutUseCase = LogoutUseCase(repository: authRepository);
           return MultiBlocProvider(
             providers: [
-              BlocProvider(
+              BlocProvider<AppServicesCubit>(
                 create: (_) => AppServicesCubit(
                   getAccountsForSelectUseCase: getAccounts,
                   withdrawUseCase: withdrawUseCase,
                   depositUseCase: depositUseCase,
                   transferUseCase: transferUseCase,
+                 
                 ),
-                child: const AppServicesPage(),
+              ),
+               BlocProvider(
+                create: (_) => LogoutCubit(logoutUseCase: logoutUseCase),
               ),
             ],
             child: const AppServicesPage(),

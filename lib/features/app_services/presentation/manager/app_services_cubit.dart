@@ -5,6 +5,7 @@ import 'package:complaints_app/features/app_services/domain/use_case/params/tran
 import 'package:complaints_app/features/app_services/domain/use_case/params/withdraw_params.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/transfer_use_case.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/withdraw_use_case.dart';
+import 'package:complaints_app/features/auth/domain/use_cases/logout_use_case.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'app_services_state.dart';
