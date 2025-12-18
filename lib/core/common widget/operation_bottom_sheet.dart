@@ -5,11 +5,8 @@ import 'package:complaints_app/core/enums/operation_type.dart';
 import 'package:complaints_app/core/theme/color/app_color.dart';
 import 'package:complaints_app/core/utils/media_query_config.dart';
 import 'package:complaints_app/features/app_services/domain/entities/notification_entity.dart';
-import 'package:complaints_app/features/app_services/presentation/manager/app_services_cubit.dart';
-import 'package:complaints_app/features/app_services/presentation/manager/app_services_state.dart';
 import 'package:complaints_app/features/auth/presentation/widget/auth_field_label.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 class OperationBottomSheet extends StatefulWidget {

@@ -1,5 +1,7 @@
 ﻿import 'package:complaints_app/core/enums/operation_type.dart';
 import 'package:complaints_app/core/events/app_event_bus.dart';
+import 'package:complaints_app/features/app_services/domain/chain/operation_chain_factory.dart';
+import 'package:complaints_app/features/app_services/domain/chain/operation_request.dart';
 import 'package:complaints_app/features/app_services/domain/events/operation_events.dart';
 import 'package:complaints_app/features/app_services/domain/strategies/operation_strategy.dart';
 import 'package:complaints_app/features/app_services/domain/strategies/operation_strategy_factory.dart';
@@ -39,7 +41,7 @@ class AppServicesCubit extends Cubit<AppServicesState> {
     );
 
     if (state.accountsForSelect.isNotEmpty) {
-      debugPrint("Æ’o: accountsForSelect already loaded, skip fetch");
+      debugPrint("→ accountsForSelect already loaded, skip fetch");
       debugPrint("=================================================");
       return;
     }
@@ -56,7 +58,7 @@ class AppServicesCubit extends Cubit<AppServicesState> {
 
     result.fold(
       (failure) {
-        debugPrint("Æ’o- loadAccountsForSelect failed: ${failure.errMessage}");
+        debugPrint("✗ loadAccountsForSelect failed: ${failure.errMessage}");
         emit(
           state.copyWith(
             status: AppServicesStatus.error,
@@ -66,9 +68,7 @@ class AppServicesCubit extends Cubit<AppServicesState> {
         );
       },
       (accounts) {
-        debugPrint(
-          "Æ’o: loadAccountsForSelect success: ${accounts.length} items",
-        );
+        debugPrint("✓ loadAccountsForSelect success: ${accounts.length} items");
         emit(
           state.copyWith(
             status: AppServicesStatus.success,
@@ -118,53 +118,61 @@ class AppServicesCubit extends Cubit<AppServicesState> {
   }
 
   Future<void> submitScheduled() async {
+    final chain = OperationChainFactory.buildFor(OperationType.scheduled);
+
+    final req = OperationRequest(
+      type: OperationType.scheduled,
+      fromAccountId: state.selectedFromAccountId,
+      name: state.operationNameChanged,
+      amount: state.amountChanged,
+      toAccountNumber: '',
+      scheduledType: state.selectedOperationType,
+      scheduledAt: state.sectectDate,
+    );
+
+    final res = chain.handle(req);
+    if (!res.ok) {
+      emit(state.copyWith(message: res.message, clearMessage: false));
+      return;
+    }
+
     debugPrint("============ AppServicesCubit.submitScheduled ============");
 
     if (state.isSubmitting) return;
-    final fromAccountId = state.selectedFromAccountId;
-    final selectedOperationType = state.selectedOperationType;
-    final selectedDate = state.sectectDate;
+    final fromAccountId = state.selectedFromAccountId!;
+    final selectedOperationType = state.selectedOperationType!;
+    final selectedDate = state.sectectDate!;
     final amount = state.amountChanged.trim();
     final name = state.operationNameChanged.trim();
-    if (fromAccountId == null) {
-      emit(
-        state.copyWith(message: 'O15OrO¦Oñ O15U,O-O3O15O', clearMessage: false),
-      );
-      return;
-    }
-    if (name.isEmpty) {
-      emit(
-        state.copyWith(
-          message: 'O15UŸO¦O O1U+U^O15U+ O15U,O1U.U,USOc',
-          clearMessage: false,
-        ),
-      );
-      return;
-    }
-    if (amount.isEmpty) {
-      emit(
-        state.copyWith(message: 'O15O_OrU, O15U,U.OU,O§', clearMessage: false),
-      );
-      return;
-    }
-    if (selectedOperationType == null) {
-      emit(
-        state.copyWith(
-          message: "Ø§Ø®ØªØ± Ù†ÙˆØ¹ Ø§Ù„Ø¹Ù…Ù„ÙŠØ©",
-          clearMessage: false,
-        ),
-      );
-      return;
-    }
-    if (selectedDate == null) {
-      emit(
-        state.copyWith(
-          message: "Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø­Ø¯Ø¯ Ø§Ù„ØªØ§Ø±ÙŠØ®",
-          clearMessage: false,
-        ),
-      );
-      return;
-    }
+
+    // final fromAccountId = state.selectedFromAccountId;
+    // final selectedOperationType = state.selectedOperationType;
+    // final selectedDate = state.sectectDate;
+    // final amount = state.amountChanged.trim();
+    // final name = state.operationNameChanged.trim();
+    // if (fromAccountId == null) {
+    //   emit(state.copyWith(message: 'اختر الحساب', clearMessage: false));
+    //   return;
+    // }
+    // if (name.isEmpty) {
+    //   emit(state.copyWith(message: 'اكتب عنوان العملية', clearMessage: false));
+    //   return;
+    // }
+    // if (amount.isEmpty) {
+    //   emit(state.copyWith(message: 'ادخل المبلغ', clearMessage: false));
+    //   return;
+    // }
+    // if (selectedOperationType == null) {
+    //   emit(state.copyWith(message: 'اختر نوع العملية', clearMessage: false));
+    //   return;
+    // }
+    // if (selectedDate == null) {
+    //   emit(
+    //     state.copyWith(message: 'الرجاء تحديد التاريخ', clearMessage: false),
+    //   );
+    //   return;
+    // }
+
     emit(
       state.copyWith(
         isSubmitting: true,
@@ -217,20 +225,33 @@ class AppServicesCubit extends Cubit<AppServicesState> {
     debugPrint(
       "============ AppServicesCubit.submitOperation ($type) ============",
     );
+    final chain = OperationChainFactory.buildFor(type);
+
+    final req = OperationRequest(
+      type: type,
+      fromAccountId: state.selectedFromAccountId,
+      name: state.operationNameChanged,
+      amount: state.amountChanged,
+      toAccountNumber: state.toAccountNumberChanged,
+    );
+
+    final res = chain.handle(req);
+    if (!res.ok) {
+      emit(state.copyWith(message: res.message, clearMessage: false));
+      return;
+    }
 
     if (state.isSubmitting) return;
 
     final strategy = OperationStrategyFactory.create(type);
     final ctx = OperationContext(state);
 
-    // 1) validate Ø¹Ø¨Ø± strategy
     final validation = strategy.validate(ctx);
     if (!validation.isValid) {
       emit(state.copyWith(message: validation.message, clearMessage: false));
       return;
     }
 
-    // 2) set submitting + reset success flags Ø§Ù„Ø®Ø§ØµØ© Ø¨Ø§Ù„Ù†ÙˆØ¹
     emit(
       state.copyWith(
         isSubmitting: true,
@@ -247,7 +268,6 @@ class AppServicesCubit extends Cubit<AppServicesState> {
       ),
     );
 
-    // 3) Ù†ÙÙ‘Ø° usecase Ø§Ù„Ù…Ù†Ø§Ø³Ø¨ (Ù‡ÙˆÙ† Ø§Ù„Ù‚Ø±Ø§Ø± Ø¹Ù†Ø¯ cubitâ€”Ø§Ù„Ø§Ø³ØªØ±Ø§ØªÙŠØ¬ÙŠØ© Ø¨Ø³ Ø±ØªÙ‘Ø¨Øª Ø§Ù„ØªØ­Ù‚Ù‚ ÙˆØ§Ù„Ø³Ù„ÙˆÙƒ)
     Future<void> run() async {
       switch (type) {
         case OperationType.withdraw:
@@ -374,8 +394,7 @@ class AppServicesCubit extends Cubit<AppServicesState> {
           emit(
             state.copyWith(
               isSubmitting: false,
-              message:
-                  'O+U^O1 O15U,O1U.U,USOc O15USO¤ U.O_O1U^U. O14U.U+ OrO_U.O15OÝ O15U,OÝO£OUSU,',
+              message: 'نوع العملية غير مدعوم ضمن خدمات التطبيق',
             ),
           );
           break;
@@ -387,12 +406,10 @@ class AppServicesCubit extends Cubit<AppServicesState> {
     debugPrint("=================================================");
   }
 
-  /// ØªØ­Ø¯ÙŠØ« Ø§Ù„Ø­Ø³Ø§Ø¨ Ø§Ù„Ù…Ø®ØªØ§Ø± Ù…Ù† Ø§Ù„Ù‚Ø§Ø¦Ù…Ø©
   void fromAccountIdChanged(int? id) {
     emit(state.copyWith(selectedFromAccountId: id));
   }
 
-  /// ØªØ­Ø¯ÙŠØ« Ø§Ø³Ù… Ø§Ù„Ø­Ø³Ø§Ø¨ Ø§Ù„Ù…Ø®ØªØ§Ø± (ÙÙŠ Ø­Ø§Ù„ Ø§Ù„Ø­Ø§Ø¬Ø©)
   void fromAccountNameChanged(String? name) {
     emit(state.copyWith(selectedFromAccountName: name));
   }
