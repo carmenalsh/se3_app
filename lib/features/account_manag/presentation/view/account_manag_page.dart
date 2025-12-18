@@ -1,3 +1,4 @@
+import 'package:complaints_app/core/adapters/feed/account_feed_adapter.dart';
 import 'package:complaints_app/core/common%20widget/card_details_widget.dart';
 import 'package:complaints_app/core/common%20widget/custom_app_bar.dart';
 import 'package:complaints_app/core/common%20widget/custom_button_widget.dart';
@@ -9,7 +10,7 @@ import 'package:complaints_app/core/utils/media_query_config.dart';
 import 'package:complaints_app/features/account_manag/presentation/manager/account_manag_cubit.dart';
 import 'package:complaints_app/features/account_manag/presentation/manager/account_manag_state.dart';
 import 'package:complaints_app/core/common%20widget/operation_bottom_sheet.dart';
-import 'package:complaints_app/features/home/presentation/widgets/type_transaction_color.dart';
+import 'package:complaints_app/core/common%20widget/type_transaction_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -49,19 +50,32 @@ class AccountManagPage extends StatelessWidget {
                     itemCount: state.accounts.length,
                     itemBuilder: (context, index) {
                       final acc = state.accounts[index];
+                      final item = AccountToFeedAdapter.adapt(acc);
 
                       return CardDetaisWidget(
-                        title: acc.name,
-                        status: acc.type,
+                        title: item.title, // acc.name
+                        status: item.typeText ?? '', // acc.type
+                        amount: item.subtitle, // "${acc.balance}..."
+                        date: item.dateText, // acc.createdAt
+                        numberAccount: item.accountNumber ?? '',
+                        accountState: item.statusText ?? '',
+                        accountDescreption: item.description ?? '',
+                        accountStateColor: stutesAccountColor(
+                          item.statusText ?? '',
+                        ),
+                        statusColor: accountTypeColor(item.typeText ?? ''),
                         editIcon: Icons.edit_document,
-                        fontSize: SizeConfig.diagonal * .024,
-                        amount: "${acc.balance} ألف ليرة سورية",
-                        date: acc.createdAt,
-                        numberAccount: acc.accountNumber,
-                        statusColor: accountTypeColor(acc.type),
-                        accountState: acc.status,
-                        accountDescreption: acc.description,
 
+                        // title: acc.name,
+                        // status: acc.type,
+                        // editIcon: Icons.edit_document,
+                        fontSize: SizeConfig.diagonal * .024,
+                        // amount: "${acc.balance} ألف ليرة سورية",
+                        // date: acc.createdAt,
+                        // numberAccount: acc.accountNumber,
+                        // statusColor: accountTypeColor(acc.type),
+                        // accountState: acc.status,
+                        // accountDescreption: acc.description,
                         onTapEditAccount: () {
                           final config =
                               operationConfigs[OperationType.editAccount]!;

@@ -1,3 +1,4 @@
+import 'package:complaints_app/core/adapters/feed/notification_feed_adapter.dart';
 import 'package:complaints_app/core/common%20widget/account_picker_field.dart';
 import 'package:complaints_app/core/common%20widget/custom_button_widget.dart';
 import 'package:complaints_app/core/common%20widget/custom_text_widget.dart';
@@ -82,10 +83,10 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
     return DateFormat('yyyy-MM-dd HH:mm:ss').format(dt);
   }
 
-  final List<Map<String, String>> _fakeNotifications = const [
-    {"title": "test1 title", "body": "test1 body", "date": "منذ 55 ثانية"},
-    {"title": "test title", "body": "test body", "date": "منذ دقيقة"},
-  ];
+  // final List<Map<String, String>> _fakeNotifications = const [
+  //   {"title": "test1 title", "body": "test1 body", "date": "منذ 55 ثانية"},
+  //   {"title": "test title", "body": "test body", "date": "منذ دقيقة"},
+  // ];
 
   // AccountItem? selected;
   @override
@@ -596,8 +597,99 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
               ),
               const SizedBox(height: 12),
             ],
+            // if (widget.config.showNotifications) ...[
+            //   const SizedBox(height: 10),
+
+            //   Padding(
+            //     padding: const EdgeInsets.symmetric(horizontal: 16),
+            //     child: Align(
+            //       alignment: Alignment.centerRight,
+            //       child: CustomTextWidget(
+            //         "الإشعارات",
+            //         fontSize: SizeConfig.diagonal * .032,
+            //         color: AppColor.textColor,
+            //       ),
+            //     ),
+            //   ),
+            //   const SizedBox(height: 10),
+
+            //   if (widget.isNotificationsLoading)
+            //     const Padding(
+            //       padding: EdgeInsets.all(20),
+            //       child: Center(child: CircularProgressIndicator()),
+            //     )
+            //   else if (widget.notificationsErrorMessage != null)
+            //     Padding(
+            //       padding: const EdgeInsets.all(16),
+            //       child: CustomTextWidget(
+            //         widget.notificationsErrorMessage!,
+            //         color: Colors.red,
+            //         textAlign: TextAlign.right,
+            //       ),
+            //     )
+            //   else if (widget.notifications.isEmpty)
+            //     const Padding(
+            //       padding: EdgeInsets.all(16),
+            //       child: CustomTextWidget(
+            //         "لا يوجد إشعارات حالياً",
+            //         color: AppColor.middleGrey,
+            //         textAlign: TextAlign.right,
+            //       ),
+            //     )
+            //   else
+            //     SizedBox(
+            //       height: SizeConfig.height * .45,
+            //       child: ListView.separated(
+            //         padding: const EdgeInsets.symmetric(horizontal: 16),
+            //         itemCount: widget.notifications.length,
+            //         separatorBuilder: (_, __) => const SizedBox(height: 10),
+            //         itemBuilder: (_, i) {
+            //           final n = widget.notifications[i];
+            //           return Container(
+            //             padding: const EdgeInsets.all(12),
+            //             decoration: BoxDecoration(
+            //               color: Colors.white,
+            //               borderRadius: BorderRadius.circular(12),
+            //               border: Border.all(color: AppColor.lightgrey),
+            //             ),
+            //             child: Column(
+            //               crossAxisAlignment: CrossAxisAlignment.end,
+            //               children: [
+            //                 CustomTextWidget(
+            //                   n.title,
+            //                   color: AppColor.black,
+            //                   fontSize: SizeConfig.diagonal * .03,
+            //                   textAlign: TextAlign.right,
+            //                 ),
+            //                 const SizedBox(height: 6),
+            //                 CustomTextWidget(
+            //                   n.body,
+            //                   color: AppColor.middleGrey,
+            //                   fontSize: SizeConfig.diagonal * .027,
+            //                   textAlign: TextAlign.right,
+            //                 ),
+            //                 const SizedBox(height: 8),
+            //                 Align(
+            //                   alignment: Alignment.centerLeft,
+            //                   child: CustomTextWidget(
+            //                     n.date,
+            //                     color: AppColor.middleGrey,
+            //                     fontSize: SizeConfig.diagonal * .024,
+            //                     textAlign: TextAlign.left,
+            //                   ),
+            //                 ),
+            //               ],
+            //             ),
+            //           );
+            //         },
+            //       ),
+            //     ),
+
+            //   const SizedBox(height: 8),
+            // ],
             if (widget.config.showNotifications) ...[
               const SizedBox(height: 10),
+
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Align(
@@ -625,66 +717,79 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
                     textAlign: TextAlign.right,
                   ),
                 )
-              else if (widget.notifications.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: CustomTextWidget(
-                    "لا يوجد إشعارات حالياً",
-                    color: AppColor.middleGrey,
-                    textAlign: TextAlign.right,
-                  ),
-                )
               else
-                SizedBox(
-                  height: SizeConfig.height * .45,
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: widget.notifications.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
-                    itemBuilder: (_, i) {
-                      final n = widget.notifications[i];
-                      return Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColor.lightgrey),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            CustomTextWidget(
-                              n.title,
-                              color: AppColor.black,
-                              fontSize: SizeConfig.diagonal * .03,
-                              textAlign: TextAlign.right,
-                            ),
-                            const SizedBox(height: 6),
-                            CustomTextWidget(
-                              n.body,
-                              color: AppColor.middleGrey,
-                              fontSize: SizeConfig.diagonal * .027,
-                              textAlign: TextAlign.right,
-                            ),
-                            const SizedBox(height: 8),
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: CustomTextWidget(
-                                n.date,
-                                color: AppColor.middleGrey,
-                                fontSize: SizeConfig.diagonal * .024,
-                                textAlign: TextAlign.left,
-                              ),
-                            ),
-                          ],
+                Builder(
+                  builder: (context) {
+                    // ✅ هون المكان الوحيد الصحيح لتعريف المتغير
+                    final items = widget.notifications
+                        .map(NotificationToFeedAdapter.adapt)
+                        .toList();
+
+                    if (items.isEmpty) {
+                      return const Padding(
+                        padding: EdgeInsets.all(16),
+                        child: CustomTextWidget(
+                          "لا يوجد إشعارات حالياً",
+                          color: AppColor.middleGrey,
+                          textAlign: TextAlign.right,
                         ),
                       );
-                    },
-                  ),
+                    }
+
+                    return SizedBox(
+                      height: SizeConfig.height * .45,
+                      child: ListView.separated(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: items.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 10),
+                        itemBuilder: (_, i) {
+                          final item = items[i];
+
+                          return Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: AppColor.lightgrey),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                CustomTextWidget(
+                                  item.title,
+                                  color: AppColor.black,
+                                  fontSize: SizeConfig.diagonal * .03,
+                                  textAlign: TextAlign.right,
+                                ),
+                                const SizedBox(height: 6),
+                                CustomTextWidget(
+                                  item.subtitle,
+                                  color: AppColor.middleGrey,
+                                  fontSize: SizeConfig.diagonal * .027,
+                                  textAlign: TextAlign.right,
+                                ),
+                                const SizedBox(height: 8),
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: CustomTextWidget(
+                                    item.dateText,
+                                    color: AppColor.middleGrey,
+                                    fontSize: SizeConfig.diagonal * .024,
+                                    textAlign: TextAlign.left,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
                 ),
 
               const SizedBox(height: 8),
             ],
+
             if (widget.config.showAmount) ...[
               Padding(
                 padding: const EdgeInsets.symmetric(

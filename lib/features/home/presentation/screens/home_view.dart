@@ -1,3 +1,4 @@
+import 'package:complaints_app/core/adapters/feed/transaction_feed_adapter.dart';
 import 'package:complaints_app/core/common%20widget/custom_button_widget.dart';
 import 'package:complaints_app/core/common%20widget/custom_text_widget.dart';
 import 'package:complaints_app/core/config/route_name.dart';
@@ -7,7 +8,7 @@ import 'package:complaints_app/core/common%20widget/card_details_widget.dart';
 import 'package:complaints_app/features/home/presentation/manager/home_cubit.dart';
 import 'package:complaints_app/features/home/presentation/widgets/complaint_card_shimmer_widget.dart';
 import 'package:complaints_app/features/home/presentation/widgets/top_part_home.dart';
-import 'package:complaints_app/features/home/presentation/widgets/type_transaction_color.dart';
+import 'package:complaints_app/core/common%20widget/type_transaction_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -29,7 +30,6 @@ class HomeViewBody extends StatelessWidget {
     return Column(
       children: [
         TopPartHome(
-          
           onTapServices: () async {
             final changed = await context.pushNamed<bool>(
               AppRouteRName.showServices,
@@ -88,16 +88,20 @@ class HomeViewBody extends StatelessWidget {
                 );
               }
               final transActions = state.transActions;
+              final items = state.transActions
+                  .map(TransactionToFeedAdapter.adapt)
+                  .toList();
               return ListView.separated(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 16,
                 ),
-                itemCount: transActions.length + (state.canLoadMore ? 1 : 0),
+                // itemCount: transActions.length + (state.canLoadMore ? 1 : 0),
+                itemCount: items.length + (state.canLoadMore ? 1 : 0),
                 separatorBuilder: (_, _) =>
                     SizedBox(height: SizeConfig.height * .005),
                 itemBuilder: (context, index) {
-                  if (state.canLoadMore && index == transActions.length) {
+                  if (state.canLoadMore && index == items.length) {
                     return Center(
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -132,26 +136,40 @@ class HomeViewBody extends StatelessWidget {
                     );
                   }
                   final transAction = transActions[index];
-
-                  final statusText = transAction.type;
+                  final item = items[index];
+                  final statusText = item.typeText ?? '';
                   final statusColor = typeTransActionColor(statusText);
+                  final numberAccount =
+                      (statusText == "سحب" || statusText == "تحويل")
+                      ? (item.fromAccountNumber ?? '')
+                      : (item.toAccountNumber ?? '');
                   return GestureDetector(
                     onTap: () {},
                     child: CardDetaisWidget(
                       onTapEditAccount: () {},
-                      title: transAction.name,
+                      // title: transAction.name,
+                      // status: statusText,
+                      // numberAccount:
+                      //     statusText == "سحب" || statusText == "تحويل"
+                      //     ? transAction.fromAccountNumber!
+                      //     : transAction.toAccountNumber!,
+                      // statusColor: statusColor,
+                      // toAccount: statusText == "تحويل"
+                      //     ? transAction.toAccountNumber
+                      //     : null,
+                      // fontSize: SizeConfig.diagonal * .024,
+                      // amount: transAction.amount,
+                      // date: transAction.executedAt,
+                      title: item.title,
                       status: statusText,
-                      numberAccount:
-                          statusText == "سحب" || statusText == "تحويل"
-                          ? transAction.fromAccountNumber!
-                          : transAction.toAccountNumber!,
+                      numberAccount: numberAccount,
                       statusColor: statusColor,
                       toAccount: statusText == "تحويل"
-                          ? transAction.toAccountNumber
+                          ? item.toAccountNumber
                           : null,
+                      amount: item.amountText ?? '',
+                      date: item.dateText,
                       fontSize: SizeConfig.diagonal * .024,
-                      amount: transAction.amount,
-                      date: transAction.executedAt,
                     ),
                   );
                 },
@@ -198,5 +216,3 @@ class LabelColumnTitleValue extends StatelessWidget {
     );
   }
 }
-
-
