@@ -9,12 +9,12 @@ import 'package:complaints_app/core/theme/color/app_color.dart';
 import 'package:complaints_app/features/app_services/data/data_source/download_file_remote_data_source.dart';
 import 'package:complaints_app/features/app_services/data/repository_impl/download_file_repository_impl.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/download_file_use_case.dart';
+import 'package:complaints_app/features/app_services/presentation/composite/service_group.dart';
+import 'package:complaints_app/features/app_services/presentation/composite/service_leaf.dart';
 import 'package:complaints_app/features/app_services/presentation/manager/app_services_cubit.dart';
 import 'package:complaints_app/features/app_services/presentation/manager/app_services_state.dart';
 import 'package:complaints_app/features/app_services/presentation/manager/download_manager/download_file_cubit.dart';
 import 'package:complaints_app/features/app_services/presentation/manager/download_manager/download_file_state.dart';
-import 'package:complaints_app/features/app_services/presentation/widget/divider_widget.dart';
-import 'package:complaints_app/features/app_services/presentation/widget/services_types.dart';
 import 'package:complaints_app/features/auth/presentation/manager/logout_cubit/logout_cubit.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -123,7 +123,7 @@ class AppServicesPage extends StatelessWidget {
     );
   }
 
-  Future<bool> _openOperationWithAccounts(
+  Future<void> _openOperationWithAccounts(
     BuildContext context, {
     required OperationType type,
   }) async {
@@ -136,7 +136,7 @@ class AppServicesPage extends StatelessWidget {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(state.message!)));
-      return false;
+      return;
     }
 
     final accounts = state.accountsForSelect;
@@ -144,7 +144,7 @@ class AppServicesPage extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No accounts available right now')),
       );
-      return false;
+      return;
     }
 
     final names = accounts.map((e) => e.name).toList();
@@ -156,8 +156,7 @@ class AppServicesPage extends StatelessWidget {
       cubit.loadNotifications();
     }
 
-    // ✅ Observer flag (محلي للتابع)
-    bool didSucceed = false;
+    bool sheetClosed = false; // ✅ يمنع pop مرتين للشيت
 
     final result = await showModalBottomSheet<bool>(
       context: context,
@@ -167,7 +166,7 @@ class AppServicesPage extends StatelessWidget {
         child: BlocListener<AppServicesCubit, AppServicesState>(
           listenWhen: (p, c) => p.message != c.message && c.message != null,
           listener: (ctx, st) {
-            // ✅ 1) رسالة نجاح/فشل
+            // 1) SnackBar
             ScaffoldMessenger.of(
               context,
             ).showSnackBar(SnackBar(content: Text(st.message!)));
@@ -179,13 +178,13 @@ class AppServicesPage extends StatelessWidget {
                 st.scheduledSuccess;
 
             if (success) {
-              // ✅ Observer behavior: سجّل أنه صار نجاح خلال هذه الجلسة
-              didSucceed = true;
+              // 2) سكّر الشيت مرة واحدة فقط وبشكل آمن
+              if (!sheetClosed && Navigator.of(sheetContext).canPop()) {
+                sheetClosed = true;
+                Navigator.of(sheetContext).pop(true);
+              }
 
-              // ✅ 2) سكّر البوتم شيت + ارجع true
-              Navigator.pop(sheetContext, true); // ✅ سكّر الشيت فقط
-
-              // ✅ reset flags حسب العملية (مهم)
+              // 3) reset flags
               if (st.withdrawSuccess) cubit.resetWithdrawSuccess();
               if (st.depositSuccess) cubit.resetDepositSuccess();
               if (st.transferSuccess) cubit.resetTransferSuccess();
@@ -226,16 +225,101 @@ class AppServicesPage extends StatelessWidget {
         ),
       ),
     );
+
+    // ✅ بعد ما ينسكر الشيت ويرجع result == true:
+    // اطلع من صفحة الخدمات "بالـ frame التالي" حتى ما يصير debugLocked
     if (result == true) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (context.mounted) context.pop(true);
+        if (context.mounted) context.pop(true); // GoRouter pop
       });
     }
-    return false;
   }
 
   @override
   Widget build(BuildContext context) {
+    final groups = <ServiceGroup>[
+      // مجموعة العمليات المالية (سحب/إيداع/تحويل)
+      ServiceGroup(
+        children: [
+          ServiceLeaf(
+            title: "سحب",
+            image: AppImage.withdraw,
+            titleColor: AppColor.black,
+            onTap: () => _openOperationWithAccounts(
+              context,
+              type: OperationType.withdraw,
+            ),
+          ),
+          ServiceLeaf(
+            title: "ايداع",
+            image: AppImage.desposit,
+            titleColor: AppColor.black,
+            onTap: () => _openOperationWithAccounts(
+              context,
+              type: OperationType.deposit,
+            ),
+          ),
+          ServiceLeaf(
+            title: "تحويل",
+            image: AppImage.transformation,
+            titleColor: AppColor.black,
+            onTap: () => _openOperationWithAccounts(
+              context,
+              type: OperationType.transfer,
+            ),
+          ),
+        ],
+      ),
+
+      // مجموعة خدمات إضافية (توليد ملف/إشعارات/خروج)
+      ServiceGroup(
+        addLeadingSpace: true,
+        padding: EdgeInsets.zero,
+        space: 16, // مطابق عندك تقريباً
+        children: [
+          ServiceLeaf(
+            title: "توليد ملف",
+            image: AppImage.generateFile,
+            titleColor: AppColor.black,
+            onTap: () => _openDownloadSheet(context),
+          ),
+          ServiceLeaf(
+            title: "اشعارات",
+            image: AppImage.notification,
+            titleColor: AppColor.black,
+            onTap: () => _openOperationWithAccounts(
+              context,
+              type: OperationType.notifications,
+            ),
+          ),
+          ServiceLeaf(
+            title: "تسجيل خروج",
+            image: AppImage.logout,
+            titleColor: AppColor.black,
+            onTap: () => context.read<LogoutCubit>().logOutSubmitted(),
+          ),
+        ],
+      ),
+
+      // مجموعة الجدولة (عنصر واحد بدون Dividers)
+      ServiceGroup(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        withDividers: false,
+        scrollDirection: Axis.horizontal,
+        children: [
+          ServiceLeaf(
+            title: "جدولة",
+            image: AppImage.scheduling,
+            titleColor: AppColor.black,
+            onTap: () => _openOperationWithAccounts(
+              context,
+              type: OperationType.scheduled,
+            ),
+          ),
+        ],
+      ),
+    ];
+
     return Scaffold(
       body: Column(
         children: [
@@ -244,129 +328,130 @@ class AppServicesPage extends StatelessWidget {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          InkWell(
-                            onTap: () => _openOperationWithAccounts(
-                              context,
-                              type: OperationType.withdraw,
-                            ),
-                            child: ComplaintInformationWidget(
-                              titleColor: AppColor.black,
-                              image: AppImage.withdraw,
-                              title: "سحب",
-                            ),
-                          ),
-                          SizedBox(width: 25),
-                          DividerWidget(),
-                          SizedBox(width: 25),
-                          InkWell(
-                            onTap: () => _openOperationWithAccounts(
-                              context,
-                              type: OperationType.deposit,
-                            ),
-                            child: ComplaintInformationWidget(
-                              titleColor: AppColor.black,
-                              image: AppImage.desposit,
-                              title: "ايداع",
-                            ),
-                          ),
-                          SizedBox(width: 25),
-                          DividerWidget(),
-                          SizedBox(width: 25),
-                          InkWell(
-                            onTap: () => _openOperationWithAccounts(
-                              context,
-                              type: OperationType.transfer,
-                            ),
-                            child: ComplaintInformationWidget(
-                              titleColor: AppColor.black,
-                              image: AppImage.transformation,
-                              title: "تحويل",
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  ...groups.map((g) => g.build(context)).toList(),
+          //         Padding(
+          //           padding: const EdgeInsets.symmetric(vertical: 18),
+          //           child: SingleChildScrollView(
+          //             scrollDirection: Axis.horizontal,
+          //             child: Row(
+          //               // mainAxisAlignment: MainAxisAlignment.spaceAround,
+          //               children: [
+          //                 InkWell(
+          //                   onTap: () => _openOperationWithAccounts(
+          //                     context,
+          //                     type: OperationType.withdraw,
+          //                   ),
+          //                   child: ComplaintInformationWidget(
+          //                     titleColor: AppColor.black,
+          //                     image: AppImage.withdraw,
+          //                     title: "سحب",
+          //                   ),
+          //                 ),
+          //                 SizedBox(width: 25),
+          //                 DividerWidget(),
+          //                 SizedBox(width: 25),
+          //                 InkWell(
+          //                   onTap: () => _openOperationWithAccounts(
+          //                     context,
+          //                     type: OperationType.deposit,
+          //                   ),
+          //                   child: ComplaintInformationWidget(
+          //                     titleColor: AppColor.black,
+          //                     image: AppImage.desposit,
+          //                     title: "ايداع",
+          //                   ),
+          //                 ),
+          //                 SizedBox(width: 25),
+          //                 DividerWidget(),
+          //                 SizedBox(width: 25),
+          //                 InkWell(
+          //                   onTap: () => _openOperationWithAccounts(
+          //                     context,
+          //                     type: OperationType.transfer,
+          //                   ),
+          //                   child: ComplaintInformationWidget(
+          //                     titleColor: AppColor.black,
+          //                     image: AppImage.transformation,
+          //                     title: "تحويل",
+          //                   ),
+          //                 ),
+          //               ],
+          //             ),
+          //           ),
+          //         ),
 
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        SizedBox(width: 30),
-                        InkWell(
-                          onTap: () => _openDownloadSheet(context),
+          //         SingleChildScrollView(
+          //           scrollDirection: Axis.horizontal,
+          //           child: Row(
+          //             children: [
+          //               SizedBox(width: 30),
+          //               InkWell(
+          //                 onTap: () => _openDownloadSheet(context),
 
-                          child: ComplaintInformationWidget(
-                            titleColor: AppColor.black,
-                            image: AppImage.generateFile,
-                            title: "توليد ملف",
-                          ),
-                        ),
-                        SizedBox(width: 16),
-                        DividerWidget(),
-                        SizedBox(width: 23),
-                        InkWell(
-                          onTap: () => _openOperationWithAccounts(
-                            context,
-                            type: OperationType.notifications,
-                          ),
-                          child: ComplaintInformationWidget(
-                            titleColor: AppColor.black,
-                            image: AppImage.notification,
-                            title: "اشعارات",
-                          ),
-                        ),
-                        SizedBox(width: 24),
-                        DividerWidget(),
-                        SizedBox(width: 12),
-                        InkWell(
-                          onTap: () {
-                            debugPrint("loggg outtttt");
-                            context.read<LogoutCubit>().logOutSubmitted();
-                          },
-                          child: ComplaintInformationWidget(
-                            titleColor: AppColor.black,
-                            image: AppImage.logout,
-                            title: "تسجيل خروج",
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+          //                 child: ComplaintInformationWidget(
+          //                   titleColor: AppColor.black,
+          //                   image: AppImage.generateFile,
+          //                   title: "توليد ملف",
+          //                 ),
+          //               ),
+          //               SizedBox(width: 16),
+          //               DividerWidget(),
+          //               SizedBox(width: 23),
+          //               InkWell(
+          //                 onTap: () => _openOperationWithAccounts(
+          //                   context,
+          //                   type: OperationType.notifications,
+          //                 ),
+          //                 child: ComplaintInformationWidget(
+          //                   titleColor: AppColor.black,
+          //                   image: AppImage.notification,
+          //                   title: "اشعارات",
+          //                 ),
+          //               ),
+          //               SizedBox(width: 24),
+          //               DividerWidget(),
+          //               SizedBox(width: 12),
+          //               InkWell(
+          //                 onTap: () {
+          //                   debugPrint("loggg outtttt");
+          //                   context.read<LogoutCubit>().logOutSubmitted();
+          //                 },
+          //                 child: ComplaintInformationWidget(
+          //                   titleColor: AppColor.black,
+          //                   image: AppImage.logout,
+          //                   title: "تسجيل خروج",
+          //                 ),
+          //               ),
+          //             ],
+          //           ),
+          //         ),
 
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Row(
-                      children: [
-                        SizedBox(width: 28),
-                        InkWell(
-                          onTap: () => _openOperationWithAccounts(
-                            context,
-                            type: OperationType.scheduled,
-                          ),
+          //         Padding(
+          //           padding: const EdgeInsets.symmetric(vertical: 8),
+          //           child: Row(
+          //             children: [
+          //               SizedBox(width: 28),
+          //               InkWell(
+          //                 onTap: () => _openOperationWithAccounts(
+          //                   context,
+          //                   type: OperationType.scheduled,
+          //                 ),
 
-                          child: ComplaintInformationWidget(
-                            titleColor: AppColor.black,
-                            image: AppImage.scheduling,
-                            title: "جدولة",
-                          ),
-                        ),
-                        SizedBox(width: 36),
-                        DividerWidget(),
-                      ],
-                    ),
-                  ),
+          //                 child: ComplaintInformationWidget(
+          //                   titleColor: AppColor.black,
+          //                   image: AppImage.scheduling,
+          //                   title: "جدولة",
+          //                 ),
+          //               ),
+          //               SizedBox(width: 36),
+          //               DividerWidget(),
+          //             ],
+          //           ),
+          //         ),
                 ],
               ),
             ),
-          ),
+           ),
         ],
       ),
     );

@@ -1,6 +1,5 @@
 import 'package:complaints_app/core/config/route_name.dart';
-import 'package:complaints_app/core/databases/api/dio_consumer.dart';
-import 'package:complaints_app/core/databases/api/end_points.dart';
+import 'package:complaints_app/core/databases/api/api_factory.dart';
 import 'package:complaints_app/core/network/network_info.dart';
 import 'package:complaints_app/features/account_manag/data/data_source/account_mange_remote_data_source.dart';
 import 'package:complaints_app/features/account_manag/data/repository_impl/account_manag_repository_impl.dart';
@@ -51,13 +50,13 @@ import 'package:complaints_app/features/home/presentation/manager/home_cubit.dar
 import 'package:complaints_app/features/home/presentation/screens/home_view.dart';
 import 'package:complaints_app/features/splash%20and%20welcome/presentation/views/splash_view.dart';
 import 'package:complaints_app/features/splash%20and%20welcome/presentation/views/welcome_view.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 import '../../features/auth/presentation/manager/verify register/verify_register_cubit.dart';
+
 
 abstract class AppRourer {
   static final router = GoRouter(
@@ -78,14 +77,8 @@ abstract class AppRourer {
         path: '/loginView',
         name: AppRouteRName.loginView,
         pageBuilder: (context, state) {
-          // 1) Dio + ApiConsumer
-          final dio = Dio(
-            BaseOptions(
-              baseUrl: EndPoints.baseUrl,
-              receiveDataWhenStatusError: true,
-            ),
-          );
-          final apiConsumer = DioConsumer(dio: dio);
+          
+         final api = buildApiConsumer();
 
           // 2) NetworkInfo
           final connectionChecker = InternetConnectionChecker.createInstance();
@@ -93,7 +86,7 @@ abstract class AppRourer {
 
           // 3) RemoteDataSource
           final authRemoteDataSource = AuthRemoteDataSourceImpl(
-            apiConsumer: apiConsumer,
+            apiConsumer: api,
           );
 
           // 4) Repository
@@ -156,19 +149,14 @@ abstract class AppRourer {
         path: '/registerView',
         name: AppRouteRName.registerView,
         builder: (context, state) {
-          final dio = Dio(
-            BaseOptions(
-              baseUrl: EndPoints.baseUrl,
-              receiveDataWhenStatusError: true,
-            ),
-          );
-          final apiConsumer = DioConsumer(dio: dio);
+          
+         final api = buildApiConsumer();
 
           final connectionChecker = InternetConnectionChecker.createInstance();
           final networkInfo = NetworkInfoImpl(connectionChecker);
 
           final authRemoteDataSource = AuthRemoteDataSourceImpl(
-            apiConsumer: apiConsumer,
+            apiConsumer: api,
           );
 
           final authRepository = AuthRepositoryImpl(
@@ -191,18 +179,13 @@ abstract class AppRourer {
         builder: (context, state) {
           final email = state.extra as String;
 
-          final dio = Dio(
-            BaseOptions(
-              baseUrl: EndPoints.baseUrl,
-              receiveDataWhenStatusError: true,
-            ),
-          );
-          final apiConsumer = DioConsumer(dio: dio);
+          
+          final api = buildApiConsumer();
           final connectionChecker = InternetConnectionChecker.createInstance();
           final networkInfo = NetworkInfoImpl(connectionChecker);
 
           final authRemoteDataSource = AuthRemoteDataSourceImpl(
-            apiConsumer: apiConsumer,
+            apiConsumer: api,
           );
 
           final authRepository = AuthRepositoryImpl(
@@ -226,18 +209,13 @@ abstract class AppRourer {
 
       ShellRoute(
         builder: (context, state, child) {
-          final dio = Dio(
-            BaseOptions(
-              baseUrl: EndPoints.baseUrl,
-              receiveDataWhenStatusError: true,
-            ),
-          );
-          final apiConsumer = DioConsumer(dio: dio);
+        
+         final api = buildApiConsumer();
           final connectionChecker = InternetConnectionChecker.createInstance();
           final networkInfo = NetworkInfoImpl(connectionChecker);
 
           final authRemoteDataSource = AuthRemoteDataSourceImpl(
-            apiConsumer: apiConsumer,
+            apiConsumer: api,
           );
 
           final authRepository = AuthRepositoryImpl(
@@ -299,17 +277,12 @@ abstract class AppRourer {
         path: '/homeView',
         name: AppRouteRName.homeView,
         builder: (context, state) {
-          final dio = Dio(
-            BaseOptions(
-              baseUrl: EndPoints.baseUrl,
-              receiveDataWhenStatusError: true,
-            ),
-          );
-          final apiConsumer = DioConsumer(dio: dio);
+          
+          final api = buildApiConsumer();
 
           final connectionChecker = InternetConnectionChecker.createInstance();
           final networkInfo = NetworkInfoImpl(connectionChecker);
-          final homeRemoteDataSource = HomeRemoteDataSourceImpl(apiConsumer);
+          final homeRemoteDataSource = HomeRemoteDataSourceImpl(api);
           final homeRepository = HomeRepositoryImpl(homeRemoteDataSource);
 
           final getTransActionUseCase = GetTransActionUseCase(
@@ -321,7 +294,7 @@ abstract class AppRourer {
           // );
 
           final authRemoreDataSourcev = AuthRemoteDataSourceImpl(
-            apiConsumer: apiConsumer,
+            apiConsumer: api,
           );
           final authRepository = AuthRepositoryImpl(
             remoteDataSource: authRemoreDataSourcev,
@@ -349,13 +322,9 @@ abstract class AppRourer {
         path: '/accountManag',
         name: AppRouteRName.accountManag,
         builder: (context, state) {
-          final dio = Dio(
-            BaseOptions(
-              baseUrl: EndPoints.baseUrl,
-              receiveDataWhenStatusError: true,
-            ),
-          );
-          final api = DioConsumer(dio: dio);
+          
+          final api = buildApiConsumer();
+
           final remoteDataSource = AccountRemoteDataSourceImpl(
             apiConsumer: api,
           );
@@ -387,13 +356,8 @@ abstract class AppRourer {
         path: '/showServices',
         name: AppRouteRName.showServices,
         builder: (context, state) {
-          final dio = Dio(
-            BaseOptions(
-              baseUrl: EndPoints.baseUrl,
-              receiveDataWhenStatusError: true,
-            ),
-          );
-          final api = DioConsumer(dio: dio);
+          
+          final api = buildApiConsumer();
           final remoteDataSource = AppServicesRemoteDataSourceImpl(
             apiConsumer: api,
           );
@@ -445,13 +409,8 @@ abstract class AppRourer {
         path: '/createAccount',
         name: AppRouteRName.createAccount,
         builder: (context, state) {
-          final dio = Dio(
-            BaseOptions(
-              baseUrl: EndPoints.baseUrl,
-              receiveDataWhenStatusError: true,
-            ),
-          );
-          final api = DioConsumer(dio: dio);
+         
+         final api = buildApiConsumer();
           final remoteDataSource = CreateAccountRemoteDataSourceImpl(
             apiConsumer: api,
           );
