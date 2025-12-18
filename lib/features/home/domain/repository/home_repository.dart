@@ -7,14 +7,4 @@ abstract class HomeRepository {
     required int page,
     required int perPage,
   });
-  // Future<Either<Failure, ComplaintsPageEntity>> getComplaints({
-  //   required int page,
-  //   required int perPage,
-  // });
-
-  // Future<Either<Failure, ComplaintEntity?>> searchComplaint({
-  //   required String search,
-  // });
-
-  // Future<Either<Failure, List<NotificationEntity>>> getNotifications();
 }

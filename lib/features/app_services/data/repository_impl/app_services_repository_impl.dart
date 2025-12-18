@@ -4,6 +4,7 @@ import 'package:complaints_app/core/errors/failure.dart';
 import 'package:complaints_app/features/app_services/data/data_source/app_services_remote_data_source.dart';
 import 'package:complaints_app/features/app_services/domain/entities/account_select_item_entity.dart';
 import 'package:complaints_app/features/app_services/domain/entities/deposit_result_entity.dart';
+import 'package:complaints_app/features/app_services/domain/entities/notification_entity.dart';
 import 'package:complaints_app/features/app_services/domain/entities/scheduled_result_entity.dart';
 import 'package:complaints_app/features/app_services/domain/entities/transfer_result_entity.dart';
 import 'package:complaints_app/features/app_services/domain/entities/withdraw_result_entity.dart';
@@ -144,6 +145,38 @@ class AppServicesRepositoryImpl implements AppServicesRepository {
       return Left(CacheFailure(errMessage: e.errorMessage));
     } catch (e) {
       debugPrint("✗ transfer Unexpected error: $e");
+      debugPrint("=================================================");
+      return Left(ServerFailure(errMessage: 'حدث خطأ غير متوقع'));
+    }
+  }
+  
+  @override
+  Future<Either<Failure, List<NotificationEntity>>> getNotifications() async {
+    debugPrint("============ AppServicesRepositoryImpl.getNotifications ============");
+    try {
+      debugPrint("→ calling remoteDataSource.getNotifications");
+      final models = await remoteDataSource.getNotifications();
+
+      final entities = models.map((m) => m.toEntity()).toList();
+
+      debugPrint("← remoteDataSource.getNotifications success");
+      debugPrint("=================================================");
+
+      return Right(entities);
+    } on ServerException catch (e) {
+      debugPrint(
+        "✗ AppServicesRepositoryImpl.getNotifications ServerException: ${e.errorModel.errorMessage}",
+      );
+      debugPrint("=================================================");
+      return Left(ServerFailure(errMessage: e.errorModel.errorMessage));
+    } on CacheException catch (e) {
+      debugPrint(
+        "✗ AppServicesRepositoryImpl.getNotifications CacheException: ${e.errorMessage}",
+      );
+      debugPrint("=================================================");
+      return Left(CacheFailure(errMessage: e.errorMessage));
+    } catch (e) {
+      debugPrint("✗ AppServicesRepositoryImpl.getNotifications Unexpected error: $e");
       debugPrint("=================================================");
       return Left(ServerFailure(errMessage: 'حدث خطأ غير متوقع'));
     }

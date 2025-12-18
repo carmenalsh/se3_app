@@ -1,4 +1,5 @@
 import 'package:complaints_app/features/app_services/domain/entities/account_select_item_entity.dart';
+import 'package:complaints_app/features/app_services/domain/entities/notification_entity.dart';
 import 'package:equatable/equatable.dart';
 
 enum AppServicesStatus { initial, loading, success, error }
@@ -29,6 +30,10 @@ class AppServicesState extends Equatable {
   final String amountChanged;
   final String toAccountNumberChanged;
 
+  final List<NotificationEntity> notifications;
+  final bool isNotificationsLoading;
+  final String? notificationsErrorMessage;
+
   const AppServicesState({
     this.status = AppServicesStatus.initial,
     this.accountsForSelect = const [],
@@ -47,6 +52,9 @@ class AppServicesState extends Equatable {
     this.scheduledSuccess = false,
     this.toAccountNumberChanged = '',
     this.transferSuccess = false,
+    this.notifications = const [],
+    this.isNotificationsLoading = false,
+    this.notificationsErrorMessage,
   });
 
   bool get hasAccounts => accountsForSelect.isNotEmpty;
@@ -68,6 +76,9 @@ class AppServicesState extends Equatable {
     String? sectectDate,
     String? selectedOperationType,
     bool? scheduledSuccess,
+    List<NotificationEntity>? notifications,
+    bool? isNotificationsLoading,
+    String? notificationsErrorMessage,
   }) {
     return AppServicesState(
       status: status ?? this.status,
@@ -86,10 +97,14 @@ class AppServicesState extends Equatable {
           toAccountNumberChanged ?? this.toAccountNumberChanged,
       transferSuccess: transferSuccess ?? this.transferSuccess,
       sectectDate: sectectDate ?? this.sectectDate,
-      selectedOperationType: selectedOperationType ?? this.selectedOperationType,
+      selectedOperationType:
+          selectedOperationType ?? this.selectedOperationType,
       scheduledSuccess: scheduledSuccess ?? this.scheduledSuccess,
-
-
+      notifications: notifications ?? this.notifications,
+      isNotificationsLoading:
+          isNotificationsLoading ?? this.isNotificationsLoading,
+      notificationsErrorMessage:
+          notificationsErrorMessage ?? this.notificationsErrorMessage,
     );
   }
 
@@ -110,5 +125,8 @@ class AppServicesState extends Equatable {
     selectedOperationType,
     sectectDate,
     scheduledSuccess,
+    notificationsErrorMessage,
+    isNotificationsLoading,
+    notifications,
   ];
 }

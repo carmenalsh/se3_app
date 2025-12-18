@@ -4,8 +4,12 @@ import 'package:complaints_app/core/common%20widget/custom_text_widget.dart';
 import 'package:complaints_app/core/enums/operation_type.dart';
 import 'package:complaints_app/core/theme/color/app_color.dart';
 import 'package:complaints_app/core/utils/media_query_config.dart';
+import 'package:complaints_app/features/app_services/domain/entities/notification_entity.dart';
+import 'package:complaints_app/features/app_services/presentation/manager/app_services_cubit.dart';
+import 'package:complaints_app/features/app_services/presentation/manager/app_services_state.dart';
 import 'package:complaints_app/features/auth/presentation/widget/auth_field_label.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 class OperationBottomSheet extends StatefulWidget {
@@ -33,6 +37,9 @@ class OperationBottomSheet extends StatefulWidget {
   final Map<String, int> nameToId;
   final ValueChanged<int?>? onFromAccountIdChanged;
 
+  final List<NotificationEntity> notifications;
+  final bool isNotificationsLoading;
+  final String? notificationsErrorMessage;
   OperationBottomSheet({
     super.key,
     required this.config,
@@ -54,6 +61,9 @@ class OperationBottomSheet extends StatefulWidget {
     this.onPeriodChanged,
     this.onScheduledAtChanged,
     this.onScheduledTypeChanged,
+    this.notifications = const [],
+    this.isNotificationsLoading = false,
+    this.notificationsErrorMessage,
   });
 
   @override
@@ -74,6 +84,11 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
   String _formatDateTime(DateTime dt) {
     return DateFormat('yyyy-MM-dd HH:mm:ss').format(dt);
   }
+
+  final List<Map<String, String>> _fakeNotifications = const [
+    {"title": "test1 title", "body": "test1 body", "date": "منذ 55 ثانية"},
+    {"title": "test title", "body": "test body", "date": "منذ دقيقة"},
+  ];
 
   // AccountItem? selected;
   @override
@@ -99,17 +114,17 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
     descController = TextEditingController(
       text: widget.initialDescription ?? '',
     );
-     if (widget.config.selectTypeTransActioToScheduled) {
-    selectedScheduledType ??= 'إيداع';
-    widget.onScheduledTypeChanged?.call(selectedScheduledType!);
-  }
+    if (widget.config.selectTypeTransActioToScheduled) {
+      selectedScheduledType ??= 'إيداع';
+      widget.onScheduledTypeChanged?.call(selectedScheduledType!);
+    }
 
-  if (widget.config.showCelender) {
-    final dt = DateTime.now().add(const Duration(minutes: 5));
-    selectedScheduledDateTime ??= dt;
-    scheduledAtFormatted ??= _formatDateTime(dt);
-    widget.onScheduledAtChanged?.call(scheduledAtFormatted!);
-  }
+    if (widget.config.showCelender) {
+      final dt = DateTime.now().add(const Duration(minutes: 5));
+      selectedScheduledDateTime ??= dt;
+      scheduledAtFormatted ??= _formatDateTime(dt);
+      widget.onScheduledAtChanged?.call(scheduledAtFormatted!);
+    }
   }
 
   @override
@@ -217,25 +232,6 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
                 ),
               ),
               const SizedBox(height: 10),
-            ],
-
-            if (widget.config.showAmount) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  // vertical: 4,
-                ),
-                child: AuthFieldLabel(
-                  label: "المبلغ",
-                  hint: "ادخل مبلغا تريد ايداعه في الحساب...",
-                  suffixIcon: Icons.credit_card_outlined,
-                  keyboardType: TextInputType.number,
-                  onChanged: (value) {
-                    widget.onAmountChanged?.call(value);
-                  },
-                ),
-              ),
-              const SizedBox(height: 35),
             ],
 
             if (widget.config.showAccountName) ...[
@@ -483,7 +479,7 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
                       fontSize: SizeConfig.diagonal * .032,
                       color: AppColor.textColor,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
 
                     InkWell(
                       borderRadius: BorderRadius.circular(12),
@@ -496,12 +492,57 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
                           initialDate: initial,
                           firstDate: now,
                           lastDate: DateTime(now.year + 10),
+                          builder: (context, child) {
+                            return Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: Theme.of(context).colorScheme
+                                    .copyWith(
+                                      primary: AppColor
+                                          .primary, // لون الهيدر + الأزرار
+                                      onPrimary:
+                                          Colors.white, // لون النص داخل الهيدر
+                                      surface: Colors.white, // خلفية الديالوج
+                                      onSurface:
+                                          AppColor.black, // لون نص الأيام
+                                    ),
+                                datePickerTheme: const DatePickerThemeData(
+                                  // هون تقدر تخصص أكثر (اختياري)
+                                ),
+                              ),
+                              child: child!,
+                            );
+                          },
                         );
                         if (date == null) return;
 
                         final time = await showTimePicker(
                           context: context,
                           initialTime: TimeOfDay.fromDateTime(initial),
+                          builder: (context, child) {
+                            return Theme(
+                              data: Theme.of(context).copyWith(
+                                timePickerTheme: TimePickerThemeData(
+                                  backgroundColor: Colors.white,
+                                  // ✅ الوقت المعروض فوق (HH:MM)
+                                  hourMinuteTextColor: AppColor.primary,
+                                  hourMinuteColor: Colors.white,
+                                  // ✅ أزرار OK / CANCEL
+                                  confirmButtonStyle: TextButton.styleFrom(
+                                    foregroundColor: AppColor.primary,
+                                  ),
+                                  cancelButtonStyle: TextButton.styleFrom(
+                                    foregroundColor: AppColor.middleGrey,
+                                  ),
+                                ),
+                                colorScheme: Theme.of(context).colorScheme
+                                    .copyWith(
+                                      primary: AppColor.primary,
+                                      onSurface: AppColor.black,
+                                    ),
+                              ),
+                              child: child!,
+                            );
+                          },
                         );
                         if (time == null) return;
 
@@ -532,21 +573,22 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: AppColor.lightgrey),
-                          color: Colors.white,
+                          color: AppColor.textFieldColor,
                         ),
                         child: Row(
                           children: [
-                            const Icon(
-                              Icons.calendar_month_outlined,
-                              color: AppColor.middleGrey,
-                            ),
-                            const SizedBox(width: 10),
                             Expanded(
                               child: CustomTextWidget(
                                 scheduledAtFormatted ?? 'اختر التاريخ والوقت',
+                                fontSize: 16,
                                 color: AppColor.middleGrey,
                                 textAlign: TextAlign.right,
                               ),
+                            ),
+                            const SizedBox(width: 10),
+                            const Icon(
+                              Icons.calendar_month_outlined,
+                              color: AppColor.middleGrey,
                             ),
                           ],
                         ),
@@ -557,75 +599,137 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
               ),
               const SizedBox(height: 12),
             ],
+            if (widget.config.showNotifications) ...[
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: CustomTextWidget(
+                    "الإشعارات",
+                    fontSize: SizeConfig.diagonal * .032,
+                    color: AppColor.textColor,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
 
-            CustomButtonWidget(
-              width: double.infinity,
-              backgroundColor: AppColor.primary,
-              childHorizontalPad: SizeConfig.width * .07,
-              childVerticalPad: SizeConfig.height * .012,
-              borderRadius: 10,
+              if (widget.isNotificationsLoading)
+                const Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              else if (widget.notificationsErrorMessage != null)
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: CustomTextWidget(
+                    widget.notificationsErrorMessage!,
+                    color: Colors.red,
+                    textAlign: TextAlign.right,
+                  ),
+                )
+              else if (widget.notifications.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: CustomTextWidget(
+                    "لا يوجد إشعارات حالياً",
+                    color: AppColor.middleGrey,
+                    textAlign: TextAlign.right,
+                  ),
+                )
+              else
+                SizedBox(
+                  height: SizeConfig.height * .45,
+                  child: ListView.separated(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: widget.notifications.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    itemBuilder: (_, i) {
+                      final n = widget.notifications[i];
+                      return Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColor.lightgrey),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            CustomTextWidget(
+                              n.title,
+                              color: AppColor.black,
+                              fontSize: SizeConfig.diagonal * .03,
+                              textAlign: TextAlign.right,
+                            ),
+                            const SizedBox(height: 6),
+                            CustomTextWidget(
+                              n.body,
+                              color: AppColor.middleGrey,
+                              fontSize: SizeConfig.diagonal * .027,
+                              textAlign: TextAlign.right,
+                            ),
+                            const SizedBox(height: 8),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: CustomTextWidget(
+                                n.date,
+                                color: AppColor.middleGrey,
+                                fontSize: SizeConfig.diagonal * .024,
+                                textAlign: TextAlign.left,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
 
-              // onTap: () {
-              //   final cubit = context.read<AccountManagCubit>();
-
-              //   // ✅ منع الإرسال مرتين
-              //   // if (cubit.state.isSubmitting) return;
-
-              //   final name = nameController.text.trim();
-              //   final desc = descController.text.trim();
-              //   final status = selectedStatus?.trim();
-
-              //   // ✅ Validation بسيطة
-              //   if (name.isEmpty) {
-              //     // إذا بدك سناكبار سريع بدل state message:
-              //     ScaffoldMessenger.of(context).showSnackBar(
-              //       const SnackBar(content: Text('اسم الحساب مطلوب')),
-              //     );
-              //     return;
-              //   }
-
-              //   if (status == null || status.isEmpty) {
-              //     ScaffoldMessenger.of(context).showSnackBar(
-              //       const SnackBar(content: Text('اختر حالة الحساب')),
-              //     );
-              //     return;
-              //   }
-
-              //   // ✅ خزّن القيم بالـ Cubit
-              //   cubit.editNameChanged(name);
-              //   cubit.editDescriptionChanged(desc);
-              //   cubit.editStatusChanged(status);
-
-              //   // ✅ Debug: شو عم ينبعت بالضبط
-              //   debugPrint(
-              //     "============ BottomSheet Submit UpdateAccount ============",
-              //   );
-              //   debugPrint("name: $name");
-              //   debugPrint("status: $status");
-              //   debugPrint("description: $desc");
-              //   debugPrint(
-              //     "=========================================================",
-              //   );
-
-              //   // ✅ نفّذ
-              //   cubit.submitUpdateAccount();
-              // },
-              onTap: () {
-                if (widget.isSubmitting) return;
-                widget.onSubmit();
-              },
-              child: widget.isSubmitting
-                  ? const SizedBox(
-                      height: 22,
-                      width: 22,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : CustomTextWidget(
-                      "تأكيد الارسال",
-                      fontSize: SizeConfig.height * .025,
-                      color: AppColor.white,
-                    ),
-            ),
+              const SizedBox(height: 8),
+            ],
+            if (widget.config.showAmount) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  // vertical: 4,
+                ),
+                child: AuthFieldLabel(
+                  label: "المبلغ",
+                  hint: "ادخل مبلغا تريد ايداعه في الحساب...",
+                  suffixIcon: Icons.credit_card_outlined,
+                  keyboardType: TextInputType.number,
+                  onChanged: (value) {
+                    widget.onAmountChanged?.call(value);
+                  },
+                ),
+              ),
+              const SizedBox(height: 35),
+            ],
+            // ✅ لا تُظهر زر الإرسال في حالة الإشعارات
+            if (!widget.config.showNotifications)
+              CustomButtonWidget(
+                width: double.infinity,
+                backgroundColor: AppColor.primary,
+                childHorizontalPad: SizeConfig.width * .07,
+                childVerticalPad: SizeConfig.height * .012,
+                borderRadius: 10,
+                onTap: () {
+                  if (widget.isSubmitting) return;
+                  widget.onSubmit();
+                },
+                child: widget.isSubmitting
+                    ? const SizedBox(
+                        height: 22,
+                        width: 22,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : CustomTextWidget(
+                        "تأكيد الارسال",
+                        fontSize: SizeConfig.height * .025,
+                        color: AppColor.white,
+                      ),
+              ),
           ],
         ),
       ),

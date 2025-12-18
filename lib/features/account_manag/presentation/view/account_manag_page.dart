@@ -9,6 +9,7 @@ import 'package:complaints_app/core/utils/media_query_config.dart';
 import 'package:complaints_app/features/account_manag/presentation/manager/account_manag_cubit.dart';
 import 'package:complaints_app/features/account_manag/presentation/manager/account_manag_state.dart';
 import 'package:complaints_app/core/common%20widget/operation_bottom_sheet.dart';
+import 'package:complaints_app/features/home/presentation/widgets/type_transaction_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -22,7 +23,7 @@ class AccountManagPage extends StatelessWidget {
       listenWhen: (p, c) =>
           p.updateSuccess != c.updateSuccess && c.updateSuccess,
       listener: (context, state) {
-       // Navigator.pop(context); // ✅ سكّر البوتم شيت
+        // Navigator.pop(context);
       },
       child: Scaffold(
         body: Column(
@@ -57,43 +58,10 @@ class AccountManagPage extends StatelessWidget {
                         amount: "${acc.balance} ألف ليرة سورية",
                         date: acc.createdAt,
                         numberAccount: acc.accountNumber,
-                        statusColor: AppColor.blue,
+                        statusColor: accountTypeColor(acc.type),
                         accountState: acc.status,
                         accountDescreption: acc.description,
-                        // onTapEditAccount: () {
-                        //   final config =
-                        //       operationConfigs[OperationType.editAccount]!;
-                        //   const accountStatusItems = [
-                        //     "نشط",
-                        //     "مجمد",
-                        //     "موقوف",
-                        //     "مغلق",
-                        //   ];
 
-                        //   // مهم: نمرر نفس cubit للـ bottomSheet
-                        //   final cubit = context.read<AccountManagCubit>();
-
-                        //   cubit.startEdit(acc);
-
-                        //   showModalBottomSheet(
-                        //     context: context,
-                        //     isScrollControlled: true,
-                        //     builder: (_) => BlocProvider.value(
-                        //       value: cubit,
-                        //       child: OperationBottomSheet(
-                        //         config: config,
-                        //         dropdownItems: accountStatusItems,
-                        //         initialAccountName: acc.name,
-                        //         initialStatus: acc.status,
-                        //         initialDescription: acc.description,
-
-                        //         // إذا خليتي البوتوم شيت عامة:
-                        //         isSubmitting: cubit.state.isSubmitting,
-                        //         onSubmit: () => cubit.submitUpdateAccount(),
-                        //       ),
-                        //     ),
-                        //   );
-                        // },
                         onTapEditAccount: () {
                           final config =
                               operationConfigs[OperationType.editAccount]!;

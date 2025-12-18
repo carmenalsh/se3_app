@@ -2,6 +2,7 @@ import 'package:complaints_app/core/databases/api/api_consumer.dart';
 import 'package:complaints_app/core/databases/api/end_points.dart';
 import 'package:complaints_app/features/app_services/data/models/account_select_item_model.dart';
 import 'package:complaints_app/features/app_services/data/models/deposit_result_model.dart';
+import 'package:complaints_app/features/app_services/data/models/notification_model.dart';
 import 'package:complaints_app/features/app_services/data/models/scheduled_result_model.dart';
 import 'package:complaints_app/features/app_services/data/models/transfer_result_model.dart';
 import 'package:complaints_app/features/app_services/data/models/withdraw_result_model.dart';
@@ -22,6 +23,7 @@ abstract class AppServicesRemoteDataSource {
   });
    Future<TransferResultModel> transfer({required TransferParams params});
    Future<ScheduledResultModel> scheduledTransaction(ScheduledParams params);
+    Future<List<NotificationModel>> getNotifications();
 }
 
 class AppServicesRemoteDataSourceImpl implements AppServicesRemoteDataSource {
@@ -122,4 +124,20 @@ Future<ScheduledResultModel> scheduledTransaction(ScheduledParams params) async 
 
   return ScheduledResultModel.fromJson(response);
 }
+ @override
+  Future<List<NotificationModel>> getNotifications() async {
+    debugPrint(
+      "============ HomeRemoteDataSourceImpl.getNotifications ============",
+    );
+
+    final response = await apiConsumer.get(EndPoints.getNotifications);
+
+    debugPrint("← response (getNotifications): $response");
+    debugPrint("=================================================");
+
+    final dataList = response['data'] as List<dynamic>;
+    return dataList
+        .map((e) => NotificationModel.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
 }

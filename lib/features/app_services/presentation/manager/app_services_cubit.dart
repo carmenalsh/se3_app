@@ -1,5 +1,6 @@
 import 'package:complaints_app/features/app_services/domain/use_case/deposit_use_case.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/get_accounts_for_select_use_case.dart';
+import 'package:complaints_app/features/app_services/domain/use_case/notification_use_case.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/params/deposit_params.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/params/scheduled_params.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/params/transfer_params.dart';
@@ -17,12 +18,14 @@ class AppServicesCubit extends Cubit<AppServicesState> {
   final DepositUseCase depositUseCase;
   final TransferUseCase transferUseCase;
   final ScheduledUseCase scheduledUseCase;
+  final GetNotificationsUseCase getNotificationsUseCase;
   AppServicesCubit({
     required this.getAccountsForSelectUseCase,
     required this.withdrawUseCase,
     required this.depositUseCase,
     required this.transferUseCase,
     required this.scheduledUseCase,
+    required this.getNotificationsUseCase,
   }) : super(const AppServicesState());
 
   /// تحميل قائمة الحسابات (للاستخدام في السحب/الإيداع...)
@@ -263,6 +266,7 @@ class AppServicesCubit extends Cubit<AppServicesState> {
     if (state.isSubmitting) return;
 
     final fromAccountId = state.selectedFromAccountId;
+
     final name = state.operationNameChanged.trim();
     final amount = state.amountChanged.trim();
     final toAccountNumber = state.toAccountNumberChanged.trim();
@@ -327,6 +331,37 @@ class AppServicesCubit extends Cubit<AppServicesState> {
     debugPrint("=================================================");
   }
 
+  Future<void> loadNotifications() async {
+    debugPrint("============ HomeCubit.loadNotifications ============");
+
+    emit(
+      state.copyWith(
+        isNotificationsLoading: true,
+        notificationsErrorMessage: null,
+      ),
+    );
+
+    final result = await getNotificationsUseCase();
+
+    result.fold(
+      (failure) {
+        debugPrint("loadNotifications -> FAILURE: ${failure.errMessage}");
+        emit(
+          state.copyWith(
+            isNotificationsLoading: false,
+            notificationsErrorMessage: failure.errMessage,
+          ),
+        );
+      },
+      (list) {
+        debugPrint("loadNotifications -> SUCCESS, count: ${list.length}");
+        emit(
+          state.copyWith(isNotificationsLoading: false, notifications: list),
+        );
+      },
+    );
+  }
+
   /// تحديث الحساب المختار من القائمة
   void fromAccountIdChanged(int? id) {
     emit(state.copyWith(selectedFromAccountId: id));
@@ -344,14 +379,6 @@ class AppServicesCubit extends Cubit<AppServicesState> {
   void amountChanged(String value) {
     emit(state.copyWith(amountChanged: value));
   }
-  void scheduledTypeChanged(String v) {
-  emit(state.copyWith(selectedOperationType: v));
-}
-
-void scheduledDateChanged(String v) {
-  emit(state.copyWith(sectectDate: v));
-}
-
 
   void resetWithdrawSuccess() {
     if (!state.withdrawSuccess) return;
@@ -373,7 +400,14 @@ void scheduledDateChanged(String v) {
   }
 
   void resetScheduledSuccess() {
-    if (!state.scheduledSuccess) return;
-    emit(state.copyWith(scheduledSuccess: false));
+    if (!state.transferSuccess) return;
+    emit(state.copyWith(transferSuccess: false));
   }
+  void scheduledTypeChanged(String v) {
+  emit(state.copyWith(selectedOperationType: v));
+}
+
+void scheduledDateChanged(String v) {
+  emit(state.copyWith(sectectDate: v));
+}
 }

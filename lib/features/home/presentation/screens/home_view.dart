@@ -4,7 +4,7 @@ import 'package:complaints_app/core/config/route_name.dart';
 import 'package:complaints_app/core/theme/color/app_color.dart';
 import 'package:complaints_app/core/utils/media_query_config.dart';
 import 'package:complaints_app/core/common%20widget/card_details_widget.dart';
-import 'package:complaints_app/features/home/presentation/manager/home_cubit/home_cubit.dart';
+import 'package:complaints_app/features/home/presentation/manager/home_cubit.dart';
 import 'package:complaints_app/features/home/presentation/widgets/complaint_card_shimmer_widget.dart';
 import 'package:complaints_app/features/home/presentation/widgets/top_part_home.dart';
 import 'package:complaints_app/features/home/presentation/widgets/type_transaction_color.dart';
@@ -17,27 +17,7 @@ class HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        // child: BlocListener<LogoutCubit, LogoutState>(
-        //   listenWhen: (prev, curr) => prev.status != curr.status,
-        //   listener: (context, state) {
-        //     if (state.status == LogoutStatusEnum.success) {
-        //       context.goNamed(AppRouteRName.welcomeView);
-        //     }
-
-        //     if (state.status == LogoutStatusEnum.error) {
-        //       showTopSnackBar(
-        //         context,
-        //         message: state.message ?? 'حدث خطأ أثناء تسجيل الخروج',
-        //         isSuccess: false,
-        //       );
-        //     }
-        //   },
-        child: HomeViewBody(),
-        //),
-      ),
-    );
+    return Scaffold(body: SafeArea(child: HomeViewBody()));
   }
 }
 
@@ -49,9 +29,7 @@ class HomeViewBody extends StatelessWidget {
     return Column(
       children: [
         TopPartHome(
-          onChangedSearch: (value) {
-            // context.read<HomeCubit>().searchTextChanged(value);
-          },
+          
           onTapServices: () async {
             final changed = await context.pushNamed<bool>(
               AppRouteRName.showServices,
@@ -60,20 +38,10 @@ class HomeViewBody extends StatelessWidget {
             if (changed == true) {
               context.read<HomeCubit>().refreshTransactions();
             }
-
-           
           },
 
           onTapAccountsManag: () {
             context.pushNamed(AppRouteRName.accountManag);
-           
-          },
-
-          onSearchTap: (query) {
-            // context.read<HomeCubit>().searchComplaint(query);
-          },
-          onTapCancel: () {
-            // context.read<HomeCubit>().cancelSearch();
           },
         ),
 
@@ -97,7 +65,6 @@ class HomeViewBody extends StatelessWidget {
         SizedBox(height: SizeConfig.height * .001),
         Expanded(
           child: BlocBuilder<HomeCubit, HomeState>(
-
             builder: (context, state) {
               if (state.status == HomeStatusEnum.loading &&
                   state.transActions.isEmpty) {
@@ -232,17 +199,4 @@ class LabelColumnTitleValue extends StatelessWidget {
   }
 }
 
-Color _mapStatusColor(String status) {
-  switch (status) {
-    case 'معلقة':
-      return AppColor.middleGrey;
-    case 'قيد المعالجة':
-      return AppColor.blue;
-    case 'تم معالجتها':
-      return AppColor.green;
-    case 'تم رفضها':
-      return AppColor.red;
-    default:
-      return AppColor.middleGrey;
-  }
-}
+

@@ -15,3 +15,18 @@ Color typeTransActionColor(String status) {
       return AppColor.borderContainer;
   }
 }
+
+Color accountTypeColor(String status) {
+  switch (status) {
+    case "توفير":
+      return AppColor.middleGrey;
+    case "جاري":
+      return AppColor.blue;
+    case "استثماري":
+      return AppColor.green;
+    case "قرض":
+      return AppColor.red;
+    default:
+      return AppColor.borderContainer;
+  }
+}

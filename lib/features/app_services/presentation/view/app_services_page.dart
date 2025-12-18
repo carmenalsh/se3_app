@@ -145,12 +145,15 @@ class AppServicesPage extends StatelessWidget {
       );
       return;
     }
-   
 
     final names = accounts.map((e) => e.name).toList();
     final map = {for (final a in accounts) a.name: a.id};
 
     final config = operationConfigs[type]!;
+
+    if (type == OperationType.notifications) {
+      cubit.loadNotifications();
+    }
 
     final result = await showModalBottomSheet<bool>(
       context: context,
@@ -172,10 +175,6 @@ class AppServicesPage extends StatelessWidget {
                 st.scheduledSuccess;
 
             if (success) {
-              // ✅ 2) سكّر البوتم شيت + ارجع true
-              Navigator.pop(sheetContext, true);
-
-              // ✅ reset flags حسب العملية (مهم)
               if (st.withdrawSuccess) cubit.resetWithdrawSuccess();
               if (st.depositSuccess) cubit.resetDepositSuccess();
               if (st.transferSuccess) cubit.resetTransferSuccess();
@@ -190,6 +189,9 @@ class AppServicesPage extends StatelessWidget {
                 dropdownItems: names,
                 nameToId: map,
                 isSubmitting: st.isSubmitting,
+                notifications: st.notifications,
+                isNotificationsLoading: st.isNotificationsLoading,
+                notificationsErrorMessage: st.notificationsErrorMessage,
                 onFromAccountIdChanged: cubit.fromAccountIdChanged,
                 onOperationNameChanged: cubit.operationNameChanged,
                 onAmountChanged: cubit.amountChanged,
@@ -300,10 +302,16 @@ class AppServicesPage extends StatelessWidget {
                         SizedBox(width: 16),
                         DividerWidget(),
                         SizedBox(width: 23),
-                        ComplaintInformationWidget(
-                          titleColor: AppColor.black,
-                          image: AppImage.notification,
-                          title: "اشعارات",
+                        InkWell(
+                          onTap: () => _openOperationWithAccounts(
+                            context,
+                            type: OperationType.notifications,
+                          ),
+                          child: ComplaintInformationWidget(
+                            titleColor: AppColor.black,
+                            image: AppImage.notification,
+                            title: "اشعارات",
+                          ),
                         ),
                         SizedBox(width: 24),
                         DividerWidget(),

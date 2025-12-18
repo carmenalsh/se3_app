@@ -1,6 +1,7 @@
 import 'package:complaints_app/core/errors/failure.dart';
 import 'package:complaints_app/features/app_services/domain/entities/account_select_item_entity.dart';
 import 'package:complaints_app/features/app_services/domain/entities/deposit_result_entity.dart';
+import 'package:complaints_app/features/app_services/domain/entities/notification_entity.dart';
 import 'package:complaints_app/features/app_services/domain/entities/scheduled_result_entity.dart';
 import 'package:complaints_app/features/app_services/domain/entities/transfer_result_entity.dart';
 import 'package:complaints_app/features/app_services/domain/entities/withdraw_result_entity.dart';
@@ -8,7 +9,6 @@ import 'package:complaints_app/features/app_services/domain/use_case/params/depo
 import 'package:complaints_app/features/app_services/domain/use_case/params/scheduled_params.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/params/transfer_params.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/params/withdraw_params.dart';
-import 'package:complaints_app/features/auth/domain/entities/logout_response.dart';
 import 'package:dartz/dartz.dart';
 
 abstract class AppServicesRepository {
@@ -25,4 +25,5 @@ abstract class AppServicesRepository {
  Future<Either<Failure, ScheduledResultEntity>> scheduledTransaction(
   ScheduledParams params,
 );
+  Future<Either<Failure, List<NotificationEntity>>> getNotifications();
 }

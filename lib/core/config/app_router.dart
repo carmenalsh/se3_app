@@ -12,6 +12,7 @@ import 'package:complaints_app/features/app_services/data/data_source/app_servic
 import 'package:complaints_app/features/app_services/data/repository_impl/app_services_repository_impl.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/deposit_use_case.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/get_accounts_for_select_use_case.dart';
+import 'package:complaints_app/features/app_services/domain/use_case/notification_use_case.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/scheduled_use_case.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/transfer_use_case.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/withdraw_use_case.dart';
@@ -46,7 +47,7 @@ import 'package:complaints_app/features/create_account/presentation/view/create_
 import 'package:complaints_app/features/home/data/data_sources/home_remote_data_source.dart';
 import 'package:complaints_app/features/home/data/repository_impl/home_repository_impl.dart';
 import 'package:complaints_app/features/home/domain/use_cases/get_transaction_use_case.dart';
-import 'package:complaints_app/features/home/presentation/manager/home_cubit/home_cubit.dart';
+import 'package:complaints_app/features/home/presentation/manager/home_cubit.dart';
 import 'package:complaints_app/features/home/presentation/screens/home_view.dart';
 import 'package:complaints_app/features/splash%20and%20welcome/presentation/views/splash_view.dart';
 import 'package:complaints_app/features/splash%20and%20welcome/presentation/views/welcome_view.dart';
@@ -406,6 +407,7 @@ abstract class AppRourer {
           final depositUseCase = DepositUseCase(repository: repository);
           final transferUseCase = TransferUseCase(repository: repository);
           final scheduledUseCase = ScheduledUseCase(repository: repository);
+          final getNotificationsUseCase = GetNotificationsUseCase(repository: repository);
 
           final connectionChecker = InternetConnectionChecker.createInstance();
           final networkInfo = NetworkInfoImpl(connectionChecker);
@@ -426,6 +428,7 @@ abstract class AppRourer {
                   depositUseCase: depositUseCase,
                   transferUseCase: transferUseCase, 
                   scheduledUseCase: scheduledUseCase,
+                   getNotificationsUseCase: getNotificationsUseCase,
                  
                 ),
               ),

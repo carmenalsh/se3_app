@@ -5,6 +5,7 @@ enum OperationType {
   editAccount,
   download,
   scheduled,
+  notifications,
 }
 
 class OperationConfig {
@@ -20,6 +21,7 @@ class OperationConfig {
   final bool showChoosePeriod;
   final bool showCelender;
   final bool selectTypeTransActioToScheduled;
+  final bool showNotifications;
   const OperationConfig({
     required this.title,
     this.showFromAccount = false,
@@ -33,6 +35,7 @@ class OperationConfig {
     this.showChoosePeriod = false,
     this.selectTypeTransActioToScheduled = false,
     this.showCelender = false,
+    this.showNotifications = false,
   });
 }
 
@@ -76,4 +79,9 @@ const operationConfigs = {
     selectTypeTransActioToScheduled: true,
     showAmount: true,
   ),
+   OperationType.notifications : OperationConfig(
+    title: "الاشعارات",
+    showNotifications: true,
+    )
+  
 };

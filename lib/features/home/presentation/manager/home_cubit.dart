@@ -8,16 +8,12 @@ part 'home_state.dart';
 class HomeCubit extends Cubit<HomeState> {
   HomeCubit(
      this._getTransActionUseCase,
-    // this._searchComplaintUseCase,
-    // this._getNotificationsUseCase,
   ) : super(const HomeState()) {
     debugPrint("============ HomeCubit INIT ============");
     loadTransAction();
   }
 
    final GetTransActionUseCase _getTransActionUseCase;
-  // final SearchComplaintUseCase _searchComplaintUseCase;
-  // final GetNotificationsUseCase _getNotificationsUseCase;
 
   Future<void> loadTransAction({int page = 1, int perPage = 10}) async {
     if (isClosed) return;
@@ -29,7 +25,6 @@ class HomeCubit extends Cubit<HomeState> {
       state.copyWith(
         status: HomeStatusEnum.loading,
         transActions: [],
-        // isSearchMode: false,
         message: null,
         currentPage: page,
       ),
@@ -112,100 +107,5 @@ if (isClosed) return;
 
   await loadTransAction(page: 1, perPage: state.perPage);
   if (isClosed) return;
-}
-
-
-  // void searchTextChanged(String value) {
-  //   debugPrint("HomeCubit.searchTextChanged -> $value");
-  //   emit(state.copyWith(searchText: value));
-  // }
-
-  // Future<void> cancelSearch() async {
-  //   debugPrint("HomeCubit.cancelSearch");
-  //   emit(state.copyWith(searchText: '', isSearchMode: false));
-  //   await loadComplaints(page: 1, perPage: state.perPage);
-  // }
-
-  // Future<void> searchComplaint(String search) async {
-  //   final trimmed = search.trim();
-
-  //   if (trimmed.isEmpty) {
-  //     await loadComplaints(page: 1, perPage: state.perPage);
-  //     return;
-  //   }
-
-  //   emit(
-  //     state.copyWith(
-  //       status: HomeStatusEnum.loading,
-  //       complaints: [],
-  //       isSearchMode: true,
-  //       message: null,
-  //       currentPage: 1,
-  //       lastPage: 1,
-  //     ),
-  //   );
-
-  //   final result = await _searchComplaintUseCase(trimmed);
-
-  //   result.fold(
-  //     (failure) {
-  //       emit(
-  //         state.copyWith(
-  //           status: HomeStatusEnum.error,
-  //           message: failure.errMessage,
-  //         ),
-  //       );
-  //     },
-  //     (complaint) {
-  //       if (complaint == null) {
-  //         emit(
-  //           state.copyWith(
-  //             status: HomeStatusEnum.success,
-  //             complaints: const [],
-  //             isSearchMode: true,
-  //           ),
-  //         );
-  //       } else {
-  //         emit(
-  //           state.copyWith(
-  //             status: HomeStatusEnum.success,
-  //             complaints: [complaint],
-  //             isSearchMode: true,
-  //           ),
-  //         );
-  //       }
-  //     },
-  //   );
-  // }
-
-  // Future<void> loadNotifications() async {
-  //   debugPrint("============ HomeCubit.loadNotifications ============");
-
-  //   emit(
-  //     state.copyWith(
-  //       isNotificationsLoading: true,
-  //       notificationsErrorMessage: null,
-  //     ),
-  //   );
-
-  //   final result = await _getNotificationsUseCase();
-
-  //   result.fold(
-  //     (failure) {
-  //       debugPrint("loadNotifications -> FAILURE: ${failure.errMessage}");
-  //       emit(
-  //         state.copyWith(
-  //           isNotificationsLoading: false,
-  //           notificationsErrorMessage: failure.errMessage,
-  //         ),
-  //       );
-  //     },
-  //     (list) {
-  //       debugPrint("loadNotifications -> SUCCESS, count: ${list.length}");
-  //       emit(
-  //         state.copyWith(isNotificationsLoading: false, notifications: list),
-  //       );
-  //     },
-  //   );
-  // }
+} 
 }
