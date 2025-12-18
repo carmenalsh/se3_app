@@ -19,6 +19,7 @@ import 'package:complaints_app/features/auth/presentation/manager/logout_cubit/l
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:open_filex/open_filex.dart';
 
 class AppServicesPage extends StatelessWidget {
@@ -122,7 +123,7 @@ class AppServicesPage extends StatelessWidget {
     );
   }
 
-  Future<void> _openOperationWithAccounts(
+  Future<bool> _openOperationWithAccounts(
     BuildContext context, {
     required OperationType type,
   }) async {
@@ -135,7 +136,7 @@ class AppServicesPage extends StatelessWidget {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(state.message!)));
-      return;
+      return false;
     }
 
     final accounts = state.accountsForSelect;
@@ -143,7 +144,7 @@ class AppServicesPage extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No accounts available right now')),
       );
-      return;
+      return false;
     }
 
     final names = accounts.map((e) => e.name).toList();
@@ -154,6 +155,9 @@ class AppServicesPage extends StatelessWidget {
     if (type == OperationType.notifications) {
       cubit.loadNotifications();
     }
+
+    // ✅ Observer flag (محلي للتابع)
+    bool didSucceed = false;
 
     final result = await showModalBottomSheet<bool>(
       context: context,
@@ -175,8 +179,11 @@ class AppServicesPage extends StatelessWidget {
                 st.scheduledSuccess;
 
             if (success) {
+              // ✅ Observer behavior: سجّل أنه صار نجاح خلال هذه الجلسة
+              didSucceed = true;
+
               // ✅ 2) سكّر البوتم شيت + ارجع true
-              Navigator.pop(sheetContext, true);
+              Navigator.pop(sheetContext, true); // ✅ سكّر الشيت فقط
 
               // ✅ reset flags حسب العملية (مهم)
               if (st.withdrawSuccess) cubit.resetWithdrawSuccess();
@@ -185,7 +192,6 @@ class AppServicesPage extends StatelessWidget {
               if (st.scheduledSuccess) cubit.resetScheduledSuccess();
             }
           },
-
           child: BlocBuilder<AppServicesCubit, AppServicesState>(
             builder: (_, st) {
               return OperationBottomSheet(
@@ -208,7 +214,6 @@ class AppServicesPage extends StatelessWidget {
                 onScheduledAtChanged: (type == OperationType.scheduled)
                     ? cubit.scheduledDateChanged
                     : null,
-
                 onSubmit: () {
                   if (type == OperationType.withdraw) cubit.submitWithdraw();
                   if (type == OperationType.deposit) cubit.submitDeposit();
@@ -221,11 +226,12 @@ class AppServicesPage extends StatelessWidget {
         ),
       ),
     );
-
-    // ✅ 3) إذا نجحت العملية ارجع true للي فوقك (الصفحة السابقة)
     if (result == true) {
-      Navigator.pop(context, true); // يعني AppServicesPage رجّع true للـ Home
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) context.pop(true);
+      });
     }
+    return false;
   }
 
   @override

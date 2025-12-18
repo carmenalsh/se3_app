@@ -4,8 +4,9 @@ import 'package:complaints_app/core/utils/media_query_config.dart';
 import 'package:flutter/material.dart';
 
 class CustomAppBar extends StatelessWidget {
-  const CustomAppBar({super.key, required this.title});
+  const CustomAppBar({super.key, required this.title,this.onPressed});
   final String title;
+  final void Function()? onPressed;
   @override
   Widget build(BuildContext context) {
     return Padding(

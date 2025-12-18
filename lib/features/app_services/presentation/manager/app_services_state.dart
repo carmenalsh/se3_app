@@ -7,6 +7,9 @@ enum AppServicesStatus { initial, loading, success, error }
 class AppServicesState extends Equatable {
   final AppServicesStatus status;
 
+  final bool didChange;
+
+
   // ✅ حسابات السيلكت (forSelect)
   final List<AccountSelectItemEntity> accountsForSelect;
 
@@ -36,6 +39,8 @@ class AppServicesState extends Equatable {
 
   const AppServicesState({
     this.status = AppServicesStatus.initial,
+    this.didChange = false,
+
     this.accountsForSelect = const [],
     this.selectedFromAccountId,
     this.selectedFromAccountName,
@@ -79,6 +84,8 @@ class AppServicesState extends Equatable {
     List<NotificationEntity>? notifications,
     bool? isNotificationsLoading,
     String? notificationsErrorMessage,
+    bool? didChange,
+
   }) {
     return AppServicesState(
       status: status ?? this.status,
@@ -105,6 +112,8 @@ class AppServicesState extends Equatable {
           isNotificationsLoading ?? this.isNotificationsLoading,
       notificationsErrorMessage:
           notificationsErrorMessage ?? this.notificationsErrorMessage,
+          didChange: didChange ?? this.didChange,
+
     );
   }
 
@@ -128,5 +137,6 @@ class AppServicesState extends Equatable {
     notificationsErrorMessage,
     isNotificationsLoading,
     notifications,
+    didChange
   ];
 }
