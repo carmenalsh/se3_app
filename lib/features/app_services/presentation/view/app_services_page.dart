@@ -175,6 +175,10 @@ class AppServicesPage extends StatelessWidget {
                 st.scheduledSuccess;
 
             if (success) {
+              // ✅ 2) سكّر البوتم شيت + ارجع true
+              Navigator.pop(sheetContext, true);
+
+              // ✅ reset flags حسب العملية (مهم)
               if (st.withdrawSuccess) cubit.resetWithdrawSuccess();
               if (st.depositSuccess) cubit.resetDepositSuccess();
               if (st.transferSuccess) cubit.resetTransferSuccess();
