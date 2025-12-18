@@ -1,4 +1,6 @@
-import 'package:complaints_app/core/enums/operation_type.dart';
+﻿import 'package:complaints_app/core/enums/operation_type.dart';
+import 'package:complaints_app/core/events/app_event_bus.dart';
+import 'package:complaints_app/features/app_services/domain/events/operation_events.dart';
 import 'package:complaints_app/features/app_services/domain/strategies/operation_strategy.dart';
 import 'package:complaints_app/features/app_services/domain/strategies/operation_strategy_factory.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/deposit_use_case.dart';
@@ -31,15 +33,13 @@ class AppServicesCubit extends Cubit<AppServicesState> {
     required this.getNotificationsUseCase,
   }) : super(const AppServicesState());
 
-  /// تحميل قائمة الحسابات (للاستخدام في السحب/الإيداع...)
   Future<void> loadAccountsForSelect() async {
     debugPrint(
       "============ AppServicesCubit.loadAccountsForSelect ============",
     );
 
-    // إذا كانت القائمة موجودة مسبقاً لا نعيد الطلب
     if (state.accountsForSelect.isNotEmpty) {
-      debugPrint("ƒo: accountsForSelect already loaded, skip fetch");
+      debugPrint("Æ’o: accountsForSelect already loaded, skip fetch");
       debugPrint("=================================================");
       return;
     }
@@ -56,7 +56,7 @@ class AppServicesCubit extends Cubit<AppServicesState> {
 
     result.fold(
       (failure) {
-        debugPrint("ƒo- loadAccountsForSelect failed: ${failure.errMessage}");
+        debugPrint("Æ’o- loadAccountsForSelect failed: ${failure.errMessage}");
         emit(
           state.copyWith(
             status: AppServicesStatus.error,
@@ -67,7 +67,7 @@ class AppServicesCubit extends Cubit<AppServicesState> {
       },
       (accounts) {
         debugPrint(
-          "ƒo: loadAccountsForSelect success: ${accounts.length} items",
+          "Æ’o: loadAccountsForSelect success: ${accounts.length} items",
         );
         emit(
           state.copyWith(
@@ -85,194 +85,6 @@ class AppServicesCubit extends Cubit<AppServicesState> {
   Future<void> submitWithdraw() => submitOperation(OperationType.withdraw);
   Future<void> submitDeposit() => submitOperation(OperationType.deposit);
   Future<void> submitTransfer() => submitOperation(OperationType.transfer);
-
-  // Future<void> submitWithdraw() async {
-  //   debugPrint("============ AppServicesCubit.submitWithdraw ============");
-
-  //   if (state.isSubmitting) return;
-
-  //   final accountId = state.selectedFromAccountId;
-  //   final name = state.operationNameChanged.trim();
-  //   final amount = state.amountChanged.trim();
-
-  //   // ✅ Validation بسيطة
-  //   if (accountId == null) {
-  //     emit(state.copyWith(message: "اختر الحساب", clearMessage: false));
-  //     return;
-  //   }
-  //   if (name.isEmpty) {
-  //     emit(state.copyWith(message: "اكتب عنوان العملية", clearMessage: false));
-  //     return;
-  //   }
-  //   if (amount.isEmpty) {
-  //     emit(state.copyWith(message: "ادخل المبلغ", clearMessage: false));
-  //     return;
-  //   }
-
-  //   emit(
-  //     state.copyWith(
-  //       isSubmitting: true,
-  //       withdrawSuccess: false,
-  //       clearMessage: true,
-  //     ),
-  //   );
-
-  //   final params = WithdrawParams(
-  //     accountId: accountId,
-  //     name: name,
-  //     amount: amount,
-  //   );
-
-  //   final result = await withdrawUseCase.call(params);
-
-  //   result.fold(
-  //     (failure) {
-  //       debugPrint("✗ submitWithdraw failed: ${failure.errMessage}");
-  //       emit(state.copyWith(isSubmitting: false, message: failure.errMessage));
-  //     },
-  //     (success) {
-  //       debugPrint("✓ submitWithdraw success: ${success.successMessage}");
-  //       emit(
-  //         state.copyWith(
-  //           isSubmitting: false,
-  //           message: success.successMessage,
-  //           withdrawSuccess: true, // ✅ مرة واحدة
-  //         ),
-  //       );
-  //     },
-  //   );
-
-  //   debugPrint("=================================================");
-  // }
-
-  // Future<void> submitDeposit() async {
-  //   debugPrint("============ AppServicesCubit.submitDeposit ============");
-
-  //   if (state.isSubmitting) return;
-
-  //   final accountId = state.selectedFromAccountId;
-  //   final name = state.operationNameChanged.trim();
-  //   final amount = state.amountChanged.trim();
-
-  //   if (accountId == null) {
-  //     emit(state.copyWith(message: "اختر الحساب", clearMessage: false));
-  //     return;
-  //   }
-  //   if (name.isEmpty) {
-  //     emit(state.copyWith(message: "اكتب عنوان العملية", clearMessage: false));
-  //     return;
-  //   }
-  //   if (amount.isEmpty) {
-  //     emit(state.copyWith(message: "ادخل المبلغ", clearMessage: false));
-  //     return;
-  //   }
-
-  //   emit(
-  //     state.copyWith(
-  //       isSubmitting: true,
-  //       depositSuccess: false, // ✅
-  //       clearMessage: true,
-  //     ),
-  //   );
-
-  //   final params = DepositParams(
-  //     accountId: accountId,
-  //     name: name,
-  //     amount: amount,
-  //   );
-
-  //   final result = await depositUseCase.call(params);
-
-  //   result.fold(
-  //     (failure) {
-  //       debugPrint("✗ submitDeposit failed: ${failure.errMessage}");
-  //       emit(state.copyWith(isSubmitting: false, message: failure.errMessage));
-  //     },
-  //     (success) {
-  //       debugPrint("✓ submitDeposit success: ${success.successMessage}");
-  //       emit(
-  //         state.copyWith(
-  //           isSubmitting: false,
-  //           message: success.successMessage,
-  //           depositSuccess: true, // ✅ مرة واحدة
-  //         ),
-  //       );
-  //     },
-  //   );
-
-  //   debugPrint("=================================================");
-  // }
-
-  // Future<void> submitTransfer() async {
-  //   debugPrint("============ AppServicesCubit.submitTransfer ============");
-
-  //   if (state.isSubmitting) return;
-
-  //   final fromAccountId = state.selectedFromAccountId;
-
-  //   final name = state.operationNameChanged.trim();
-  //   final amount = state.amountChanged.trim();
-  //   final toAccountNumber = state.toAccountNumberChanged.trim();
-
-  //   if (fromAccountId == null) {
-  //     emit(state.copyWith(message: "اختر الحساب", clearMessage: false));
-  //     return;
-  //   }
-  //   if (name.isEmpty) {
-  //     emit(state.copyWith(message: "اكتب عنوان العملية", clearMessage: false));
-  //     return;
-  //   }
-  //   if (amount.isEmpty) {
-  //     emit(state.copyWith(message: "ادخل المبلغ", clearMessage: false));
-  //     return;
-  //   }
-
-  //   if (toAccountNumber.isEmpty) {
-  //     emit(
-  //       state.copyWith(
-  //         message: "ادخل رقم الحساب المستقبِل",
-  //         clearMessage: false,
-  //       ),
-  //     );
-  //     return;
-  //   }
-
-  //   emit(
-  //     state.copyWith(
-  //       isSubmitting: true,
-  //       transferSuccess: false,
-  //       clearMessage: true,
-  //     ),
-  //   );
-
-  //   final params = TransferParams(
-  //     accountId: fromAccountId,
-  //     name: name,
-  //     amount: amount,
-  //     toAccountNumber: toAccountNumber,
-  //   );
-
-  //   final result = await transferUseCase.call(params);
-
-  //   result.fold(
-  //     (failure) {
-  //       debugPrint("✗ submitTransfer failed: ${failure.errMessage}");
-  //       emit(state.copyWith(isSubmitting: false, message: failure.errMessage));
-  //     },
-  //     (success) {
-  //       debugPrint("✓ submitTransfer success: ${success.successMessage}");
-  //       emit(
-  //         state.copyWith(
-  //           isSubmitting: false,
-  //           message: success.successMessage,
-  //           transferSuccess: true,
-  //         ),
-  //       );
-  //     },
-  //   );
-
-  //   debugPrint("=================================================");
-  // }
 
   Future<void> loadNotifications() async {
     debugPrint("============ HomeCubit.loadNotifications ============");
@@ -315,23 +127,42 @@ class AppServicesCubit extends Cubit<AppServicesState> {
     final amount = state.amountChanged.trim();
     final name = state.operationNameChanged.trim();
     if (fromAccountId == null) {
-      emit(state.copyWith(message: "اختر الحساب", clearMessage: false));
+      emit(
+        state.copyWith(message: 'O15OrO¦Oñ O15U,O-O3O15O', clearMessage: false),
+      );
       return;
     }
     if (name.isEmpty) {
-      emit(state.copyWith(message: "اكتب عنوان العملية", clearMessage: false));
+      emit(
+        state.copyWith(
+          message: 'O15UŸO¦O O1U+U^O15U+ O15U,O1U.U,USOc',
+          clearMessage: false,
+        ),
+      );
       return;
     }
     if (amount.isEmpty) {
-      emit(state.copyWith(message: "ادخل المبلغ", clearMessage: false));
+      emit(
+        state.copyWith(message: 'O15O_OrU, O15U,U.OU,O§', clearMessage: false),
+      );
       return;
     }
     if (selectedOperationType == null) {
-      emit(state.copyWith(message: "اختر نوع العملية", clearMessage: false));
+      emit(
+        state.copyWith(
+          message: "Ø§Ø®ØªØ± Ù†ÙˆØ¹ Ø§Ù„Ø¹Ù…Ù„ÙŠØ©",
+          clearMessage: false,
+        ),
+      );
       return;
     }
     if (selectedDate == null) {
-      emit(state.copyWith(message: "الرجاء حدد التاريخ", clearMessage: false));
+      emit(
+        state.copyWith(
+          message: "Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø­Ø¯Ø¯ Ø§Ù„ØªØ§Ø±ÙŠØ®",
+          clearMessage: false,
+        ),
+      );
       return;
     }
     emit(
@@ -351,16 +182,29 @@ class AppServicesCubit extends Cubit<AppServicesState> {
     final result = await scheduledUseCase.call(params);
     result.fold(
       (failure) {
-        debugPrint("✗ submitScheduled failed: ${failure.errMessage}");
+        debugPrint("submitScheduled failed: ${failure.errMessage}");
         emit(state.copyWith(isSubmitting: false, message: failure.errMessage));
+        AppEventBus.instance.emit(
+          OperationFailed(
+            type: OperationType.scheduled,
+            message: failure.errMessage,
+          ),
+        );
       },
       (success) {
-        debugPrint("✓ submitScheduled success: ${success.successMessage}");
+        debugPrint("submitScheduled success: ${success.successMessage}");
         emit(
           state.copyWith(
             isSubmitting: false,
             message: success.successMessage,
             scheduledSuccess: true,
+            didChange: true,
+          ),
+        );
+        AppEventBus.instance.emit(
+          OperationSucceeded(
+            type: OperationType.scheduled,
+            message: success.successMessage,
           ),
         );
       },
@@ -379,14 +223,14 @@ class AppServicesCubit extends Cubit<AppServicesState> {
     final strategy = OperationStrategyFactory.create(type);
     final ctx = OperationContext(state);
 
-    // 1) validate عبر strategy
+    // 1) validate Ø¹Ø¨Ø± strategy
     final validation = strategy.validate(ctx);
     if (!validation.isValid) {
       emit(state.copyWith(message: validation.message, clearMessage: false));
       return;
     }
 
-    // 2) set submitting + reset success flags الخاصة بالنوع
+    // 2) set submitting + reset success flags Ø§Ù„Ø®Ø§ØµØ© Ø¨Ø§Ù„Ù†ÙˆØ¹
     emit(
       state.copyWith(
         isSubmitting: true,
@@ -403,7 +247,7 @@ class AppServicesCubit extends Cubit<AppServicesState> {
       ),
     );
 
-    // 3) نفّذ usecase المناسب (هون القرار عند cubit—الاستراتيجية بس رتّبت التحقق والسلوك)
+    // 3) Ù†ÙÙ‘Ø° usecase Ø§Ù„Ù…Ù†Ø§Ø³Ø¨ (Ù‡ÙˆÙ† Ø§Ù„Ù‚Ø±Ø§Ø± Ø¹Ù†Ø¯ cubitâ€”Ø§Ù„Ø§Ø³ØªØ±Ø§ØªÙŠØ¬ÙŠØ© Ø¨Ø³ Ø±ØªÙ‘Ø¨Øª Ø§Ù„ØªØ­Ù‚Ù‚ ÙˆØ§Ù„Ø³Ù„ÙˆÙƒ)
     Future<void> run() async {
       switch (type) {
         case OperationType.withdraw:
@@ -414,16 +258,35 @@ class AppServicesCubit extends Cubit<AppServicesState> {
           );
           final result = await withdrawUseCase.call(params);
           result.fold(
-            (failure) => emit(
-              state.copyWith(isSubmitting: false, message: failure.errMessage),
-            ),
-            (success) => emit(
-              state.copyWith(
-                isSubmitting: false,
-                message: success.successMessage,
-                withdrawSuccess: true,
-              ),
-            ),
+            (failure) {
+              emit(
+                state.copyWith(
+                  isSubmitting: false,
+                  message: failure.errMessage,
+                ),
+              );
+
+              AppEventBus.instance.emit(
+                OperationFailed(type: type, message: failure.errMessage),
+              );
+            },
+            (success) {
+              emit(
+                state.copyWith(
+                  isSubmitting: false,
+                  message: success.successMessage,
+                  withdrawSuccess: true,
+                  didChange: true,
+                ),
+              );
+
+              AppEventBus.instance.emit(
+                OperationSucceeded(
+                  type: OperationType.withdraw,
+                  message: success.successMessage,
+                ),
+              );
+            },
           );
           break;
 
@@ -435,16 +298,35 @@ class AppServicesCubit extends Cubit<AppServicesState> {
           );
           final result = await depositUseCase.call(params);
           result.fold(
-            (failure) => emit(
-              state.copyWith(isSubmitting: false, message: failure.errMessage),
-            ),
-            (success) => emit(
-              state.copyWith(
-                isSubmitting: false,
-                message: success.successMessage,
-                depositSuccess: true,
-              ),
-            ),
+            (failure) {
+              emit(
+                state.copyWith(
+                  isSubmitting: false,
+                  message: failure.errMessage,
+                ),
+              );
+
+              AppEventBus.instance.emit(
+                OperationFailed(type: type, message: failure.errMessage),
+              );
+            },
+            (success) {
+              emit(
+                state.copyWith(
+                  isSubmitting: false,
+                  message: success.successMessage,
+                  depositSuccess: true,
+                  didChange: true,
+                ),
+              );
+
+              AppEventBus.instance.emit(
+                OperationSucceeded(
+                  type: OperationType.deposit,
+                  message: success.successMessage,
+                ),
+              );
+            },
           );
           break;
 
@@ -457,23 +339,43 @@ class AppServicesCubit extends Cubit<AppServicesState> {
           );
           final result = await transferUseCase.call(params);
           result.fold(
-            (failure) => emit(
-              state.copyWith(isSubmitting: false, message: failure.errMessage),
-            ),
-            (success) => emit(
-              state.copyWith(
-                isSubmitting: false,
-                message: success.successMessage,
-                transferSuccess: true,
-              ),
-            ),
+            (failure) {
+              emit(
+                state.copyWith(
+                  isSubmitting: false,
+                  message: failure.errMessage,
+                ),
+              );
+
+              AppEventBus.instance.emit(
+                OperationFailed(type: type, message: failure.errMessage),
+              );
+            },
+            (success) {
+              emit(
+                state.copyWith(
+                  isSubmitting: false,
+                  message: success.successMessage,
+                  transferSuccess: true,
+                  didChange: true,
+                ),
+              );
+
+              AppEventBus.instance.emit(
+                OperationSucceeded(
+                  type: OperationType.transfer,
+                  message: success.successMessage,
+                ),
+              );
+            },
           );
           break;
         default:
           emit(
             state.copyWith(
               isSubmitting: false,
-              message: "نوع العملية غير مدعوم ضمن خدمات التطبيق",
+              message:
+                  'O+U^O1 O15U,O1U.U,USOc O15USO¤ U.O_O1U^U. O14U.U+ OrO_U.O15OÝ O15U,OÝO£OUSU,',
             ),
           );
           break;
@@ -485,12 +387,12 @@ class AppServicesCubit extends Cubit<AppServicesState> {
     debugPrint("=================================================");
   }
 
-  /// تحديث الحساب المختار من القائمة
+  /// ØªØ­Ø¯ÙŠØ« Ø§Ù„Ø­Ø³Ø§Ø¨ Ø§Ù„Ù…Ø®ØªØ§Ø± Ù…Ù† Ø§Ù„Ù‚Ø§Ø¦Ù…Ø©
   void fromAccountIdChanged(int? id) {
     emit(state.copyWith(selectedFromAccountId: id));
   }
 
-  /// تحديث اسم الحساب المختار (في حال الحاجة)
+  /// ØªØ­Ø¯ÙŠØ« Ø§Ø³Ù… Ø§Ù„Ø­Ø³Ø§Ø¨ Ø§Ù„Ù…Ø®ØªØ§Ø± (ÙÙŠ Ø­Ø§Ù„ Ø§Ù„Ø­Ø§Ø¬Ø©)
   void fromAccountNameChanged(String? name) {
     emit(state.copyWith(selectedFromAccountName: name));
   }
