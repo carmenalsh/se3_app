@@ -6,6 +6,7 @@ import 'package:complaints_app/core/common%20widget/custom_text_widget.dart';
 import 'package:complaints_app/core/config/route_name.dart';
 import 'package:complaints_app/core/enums/operation_type.dart';
 import 'package:complaints_app/core/theme/color/app_color.dart';
+import 'package:complaints_app/core/utils/custom_snackbar_validation.dart';
 import 'package:complaints_app/core/utils/media_query_config.dart';
 import 'package:complaints_app/features/account_manag/presentation/manager/account_manag_cubit.dart';
 import 'package:complaints_app/features/account_manag/presentation/manager/account_manag_state.dart';
@@ -39,7 +40,7 @@ class AccountManagPage extends StatelessWidget {
                   }
 
                   if (state.status == AccountManagStatus.error) {
-                    return Center(child: Text(state.message ?? 'حدث خطأ'));
+                    return Center(child: Text(state.message ?? 'حدث خطأ ما'));
                   }
 
                   return ListView.builder(
@@ -65,17 +66,7 @@ class AccountManagPage extends StatelessWidget {
                         ),
                         statusColor: accountTypeColor(item.typeText ?? ''),
                         editIcon: Icons.edit_document,
-
-                        // title: acc.name,
-                        // status: acc.type,
-                        // editIcon: Icons.edit_document,
                         fontSize: SizeConfig.diagonal * .024,
-                        // amount: "${acc.balance} ألف ليرة سورية",
-                        // date: acc.createdAt,
-                        // numberAccount: acc.accountNumber,
-                        // statusColor: accountTypeColor(acc.type),
-                        // accountState: acc.status,
-                        // accountDescreption: acc.description,
                         onTapEditAccount: () {
                           final config =
                               operationConfigs[OperationType.editAccount]!;
@@ -105,19 +96,20 @@ class AccountManagPage extends StatelessWidget {
                                           p.message != c.message,
                                       listener: (ctx, state) {
                                         if (state.message != null) {
-                                          ScaffoldMessenger.of(
-                                            ctx,
-                                          ).showSnackBar(
-                                            SnackBar(
-                                              content: Text(state.message!),
-                                            ),
+                                          showTopSnackBar(
+                                            context,
+                                            message: state.message!,
+                                            isSuccess: false,
                                           );
                                         }
 
                                         if (state.updateSuccess) {
-                                          Navigator.of(
-                                            sheetContext,
-                                          ).pop(); // ✅ يغلق البوتم شيت فقط (ما بيرجعك للهوم)
+                                          showTopSnackBar(
+                                            context,
+                                            message: state.message!,
+                                            isSuccess: true,
+                                          );
+                                          Navigator.of(sheetContext).pop();
                                           cubit.resetUpdateFlag();
                                         }
                                       },
@@ -140,8 +132,6 @@ class AccountManagPage extends StatelessWidget {
                                                     state.isSubmitting,
                                                 onSubmit: () =>
                                                     cubit.submitUpdateAccount(),
-
-                                                // ✅ callbacks تربط الحقول بالكيوبت بدون ما البوتم شيت تعرف عنه
                                                 onNameChanged:
                                                     cubit.editNameChanged,
                                                 onDescriptionChanged: cubit
@@ -180,7 +170,7 @@ class AccountManagPage extends StatelessWidget {
                   if (result == true && context.mounted) {
                     context
                         .read<AccountManagCubit>()
-                        .getAccounts(); // ✅ refresh فوري
+                        .getAccounts(); // refresh فوري
                   }
                 },
 

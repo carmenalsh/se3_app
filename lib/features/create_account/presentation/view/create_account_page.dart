@@ -3,6 +3,7 @@ import 'package:complaints_app/core/common%20widget/custom_app_bar.dart';
 import 'package:complaints_app/core/common%20widget/custom_button_widget.dart';
 import 'package:complaints_app/core/common%20widget/custom_text_widget.dart';
 import 'package:complaints_app/core/theme/color/app_color.dart';
+import 'package:complaints_app/core/utils/custom_snackbar_validation.dart';
 import 'package:complaints_app/core/utils/media_query_config.dart';
 import 'package:complaints_app/features/auth/presentation/widget/auth_field_label.dart';
 import 'package:complaints_app/features/create_account/presentation/manager/create_account_cubit.dart';
@@ -12,7 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CreateAccountPage extends StatelessWidget {
-  CreateAccountPage({super.key});
+  const CreateAccountPage({super.key});
 
   final accounts = const ["جاري", "توفير", "قرض", "استثماري"];
 
@@ -21,11 +22,23 @@ class CreateAccountPage extends StatelessWidget {
     return BlocListener<CreateAccountCubit, CreateAccountState>(
       listenWhen: (p, c) => p.message != c.message && c.message != null,
       listener: (context, state) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(state.message!)));
+        // ScaffoldMessenger.of(
+        //   context,
+        // ).showSnackBar(SnackBar(content: Text(state.message!)));
 
+        if (state.status == CreateAccountStatus.error) {
+          showTopSnackBar(
+            context,
+            message: state.message ?? "حدث خطأ غير متوقع",
+            isSuccess: false,
+          );
+        }
         if (state.status == CreateAccountStatus.success) {
+          showTopSnackBar(
+            context,
+            message: state.message!,
+            isSuccess: true,
+          );
           Navigator.pop(context, true);
         }
       },
