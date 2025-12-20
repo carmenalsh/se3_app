@@ -50,7 +50,7 @@ class _SplashViewbodyState extends State<SplashViewBody>
           ),
         ),
         Text(
-          "نقد",
+          "تواصل",
           textAlign: TextAlign.center,
           style: TextStyle(
             fontFamily: AppFonts.tasees,

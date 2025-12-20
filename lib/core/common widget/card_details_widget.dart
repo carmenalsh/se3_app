@@ -69,10 +69,12 @@ class CardDetaisWidget extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    CustomTextWidget(
-                      title,
-                      fontSize: fontSize,
-                      color: AppColor.textInCard,
+                    Expanded(
+                      child: CustomTextWidget(
+                        title,
+                        fontSize: fontSize,
+                        color: AppColor.textInCard,
+                      ),
                     ),
                     Row(
                       children: [

@@ -6,7 +6,6 @@ import 'package:complaints_app/core/errors/failure.dart';
 
 import 'package:complaints_app/features/app_services/domain/use_case/get_accounts_for_select_use_case.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/notification_use_case.dart';
-import 'package:complaints_app/features/app_services/domain/repository/app_services_repository.dart';
 
 import '../../helpers/mocks.dart';
 

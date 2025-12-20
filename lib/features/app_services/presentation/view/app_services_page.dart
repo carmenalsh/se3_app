@@ -59,7 +59,7 @@ class AppServicesPage extends StatelessWidget {
       builder: (sheetContext) {
         return MultiBlocProvider(
           providers: [
-            BlocProvider.value(value: appCubit), // لاختيار الحساب
+            BlocProvider.value(value: appCubit), 
             BlocProvider(
               create: (_) =>
                   DownloadFileCubit(downloadFileUseCase: downloadUseCase),
@@ -288,11 +288,10 @@ class AppServicesPage extends StatelessWidget {
         ],
       ),
 
-      // مجموعة خدمات إضافية (توليد ملف/إشعارات/خروج)
       ServiceGroup(
         addLeadingSpace: true,
         padding: EdgeInsets.zero,
-        space: 16, // مطابق عندك تقريباً
+        space: 16, 
         children: [
           ServiceLeaf(
             title: "توليد ملف",
@@ -318,7 +317,6 @@ class AppServicesPage extends StatelessWidget {
         ],
       ),
 
-      // مجموعة الجدولة (عنصر واحد بدون Dividers)
       ServiceGroup(
         padding: const EdgeInsets.symmetric(vertical: 8),
         withDividers: true,
@@ -340,7 +338,7 @@ class AppServicesPage extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          CustomAppBar(title: "خدمات نقد"),
+          CustomAppBar(title: "خدمات تواصل",onPressed: (){ context.pop(true);},),
           Expanded(
             child: SingleChildScrollView(
               child: Column(

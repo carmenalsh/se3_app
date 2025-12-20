@@ -223,7 +223,7 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
                   label: "الى الحساب",
                   hint: "اختر الحساب الذي تريد التحويل اليه",
                   suffixIcon: Icons.edit,
-                  keyboardType: TextInputType.text,
+                  keyboardType: TextInputType.number,
                   onChanged: (value) {
                     widget.onToAccountNumberChanged?.call(value);
                   },
@@ -495,13 +495,10 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
                               data: Theme.of(context).copyWith(
                                 colorScheme: Theme.of(context).colorScheme
                                     .copyWith(
-                                      primary: AppColor
-                                          .primary, // لون الهيدر + الأزرار
-                                      onPrimary:
-                                          Colors.white, // لون النص داخل الهيدر
-                                      surface: Colors.white, // خلفية الديالوج
-                                      onSurface:
-                                          AppColor.black, // لون نص الأيام
+                                      primary: AppColor.primary,
+                                      onPrimary: Colors.white,
+                                      surface: Colors.white,
+                                      onSurface: AppColor.black,
                                     ),
                                 datePickerTheme: const DatePickerThemeData(
                                   // هون تقدر تخصص أكثر (اختياري)
@@ -597,96 +594,6 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
               ),
               const SizedBox(height: 12),
             ],
-            // if (widget.config.showNotifications) ...[
-            //   const SizedBox(height: 10),
-
-            //   Padding(
-            //     padding: const EdgeInsets.symmetric(horizontal: 16),
-            //     child: Align(
-            //       alignment: Alignment.centerRight,
-            //       child: CustomTextWidget(
-            //         "الإشعارات",
-            //         fontSize: SizeConfig.diagonal * .032,
-            //         color: AppColor.textColor,
-            //       ),
-            //     ),
-            //   ),
-            //   const SizedBox(height: 10),
-
-            //   if (widget.isNotificationsLoading)
-            //     const Padding(
-            //       padding: EdgeInsets.all(20),
-            //       child: Center(child: CircularProgressIndicator()),
-            //     )
-            //   else if (widget.notificationsErrorMessage != null)
-            //     Padding(
-            //       padding: const EdgeInsets.all(16),
-            //       child: CustomTextWidget(
-            //         widget.notificationsErrorMessage!,
-            //         color: Colors.red,
-            //         textAlign: TextAlign.right,
-            //       ),
-            //     )
-            //   else if (widget.notifications.isEmpty)
-            //     const Padding(
-            //       padding: EdgeInsets.all(16),
-            //       child: CustomTextWidget(
-            //         "لا يوجد إشعارات حالياً",
-            //         color: AppColor.middleGrey,
-            //         textAlign: TextAlign.right,
-            //       ),
-            //     )
-            //   else
-            //     SizedBox(
-            //       height: SizeConfig.height * .45,
-            //       child: ListView.separated(
-            //         padding: const EdgeInsets.symmetric(horizontal: 16),
-            //         itemCount: widget.notifications.length,
-            //         separatorBuilder: (_, __) => const SizedBox(height: 10),
-            //         itemBuilder: (_, i) {
-            //           final n = widget.notifications[i];
-            //           return Container(
-            //             padding: const EdgeInsets.all(12),
-            //             decoration: BoxDecoration(
-            //               color: Colors.white,
-            //               borderRadius: BorderRadius.circular(12),
-            //               border: Border.all(color: AppColor.lightgrey),
-            //             ),
-            //             child: Column(
-            //               crossAxisAlignment: CrossAxisAlignment.end,
-            //               children: [
-            //                 CustomTextWidget(
-            //                   n.title,
-            //                   color: AppColor.black,
-            //                   fontSize: SizeConfig.diagonal * .03,
-            //                   textAlign: TextAlign.right,
-            //                 ),
-            //                 const SizedBox(height: 6),
-            //                 CustomTextWidget(
-            //                   n.body,
-            //                   color: AppColor.middleGrey,
-            //                   fontSize: SizeConfig.diagonal * .027,
-            //                   textAlign: TextAlign.right,
-            //                 ),
-            //                 const SizedBox(height: 8),
-            //                 Align(
-            //                   alignment: Alignment.centerLeft,
-            //                   child: CustomTextWidget(
-            //                     n.date,
-            //                     color: AppColor.middleGrey,
-            //                     fontSize: SizeConfig.diagonal * .024,
-            //                     textAlign: TextAlign.left,
-            //                   ),
-            //                 ),
-            //               ],
-            //             ),
-            //           );
-            //         },
-            //       ),
-            //     ),
-
-            //   const SizedBox(height: 8),
-            // ],
             if (widget.config.showNotifications) ...[
               const SizedBox(height: 10),
 
@@ -753,7 +660,7 @@ class _OperationBottomSheetState extends State<OperationBottomSheet> {
                               border: Border.all(color: AppColor.lightgrey),
                             ),
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 CustomTextWidget(
                                   item.title,

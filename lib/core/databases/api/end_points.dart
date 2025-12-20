@@ -1,7 +1,7 @@
 class EndPoints {
   /// عدّل الـ baseUrl حسب الـ API تبعك
-  static const String baseUrl = 'http://192.168.155.187/api/v1/';
-  static const String refreshToken = 'http://localhost/api/refresh';
+  static const String baseUrl = 'http://192.168.137.122/api/v1/';
+  static const String refreshToken = 'http://192.168.137.122/api/refresh';
 
   // authhhhhh
   static const String registerCitizen = 'citizen/register';

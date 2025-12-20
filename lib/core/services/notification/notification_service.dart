@@ -1,9 +1,6 @@
 import 'dart:developer';
 import 'package:complaints_app/core/common%20widget/top_notification.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-import 'package:complaints_app/core/services/notification/global_keys.dart';
 
 class NotificationService {
   static Future<void> init() async {
@@ -24,11 +21,11 @@ class NotificationService {
 
       log('📨 onMessage (foreground): $title - $body');
 
-      // ✅ ما نستخدم context، نستعمل الـ ScaffoldMessenger العالمي
+    
       TopNotification.show(
         title: title,
         message: body,
-        isSuccess: true, // لاحقاً تقدر تغيّرها حسب نوع الإشعار
+        isSuccess: true, 
         duration: const Duration(seconds: 3),
       );
     });

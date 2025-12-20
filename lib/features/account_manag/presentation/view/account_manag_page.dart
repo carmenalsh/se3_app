@@ -30,7 +30,12 @@ class AccountManagPage extends StatelessWidget {
       child: Scaffold(
         body: Column(
           children: [
-            CustomAppBar(title: "ادارة حساباتك"),
+            CustomAppBar(
+              title: "ادارة حساباتك",
+              onPressed: () {
+                context.pop(true);
+              },
+            ),
             SizedBox(height: SizeConfig.height * .01),
             Expanded(
               child: BlocBuilder<AccountManagCubit, AccountManagState>(
@@ -54,10 +59,10 @@ class AccountManagPage extends StatelessWidget {
                       final item = AccountToFeedAdapter.adapt(acc);
 
                       return CardDetaisWidget(
-                        title: item.title, // acc.name
-                        status: item.typeText ?? '', // acc.type
-                        amount: item.subtitle, // "${acc.balance}..."
-                        date: item.dateText, // acc.createdAt
+                        title: item.title,
+                        status: item.typeText ?? '',
+                        amount: item.subtitle,
+                        date: item.dateText,
                         numberAccount: item.accountNumber ?? '',
                         accountState: item.statusText ?? '',
                         accountDescreption: item.description ?? '',

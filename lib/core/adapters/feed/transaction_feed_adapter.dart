@@ -3,7 +3,6 @@ import 'feed_item.dart';
 
 class TransactionToFeedAdapter {
   static FeedItem adapt(TransactionEntity t) {
-    // subtitle للعرض فقط (معلومة لطيفة)، بس ما عاد نعتمد عليه لاستخراج الحسابات
     final parts = <String>[];
     if (t.fromAccountNumber != null && t.fromAccountNumber!.isNotEmpty) {
       parts.add("من: ${t.fromAccountNumber}");
@@ -22,7 +21,7 @@ class TransactionToFeedAdapter {
       dateText: t.executedAt,
 
       amountText: t.amount,
-      typeText: t.type, // نفس اللي جاي من الباك (deposit|withdraw|transfer) أو النص اللي عندك
+      typeText: t.type, 
       fromAccountNumber: t.fromAccountNumber,
       toAccountNumber: t.toAccountNumber,
     );

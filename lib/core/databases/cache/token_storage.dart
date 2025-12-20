@@ -31,7 +31,6 @@ class TokenStorage {
       return DateTime.tryParse(raw);
     }
 
-    // رجاع تاريخ "منتهي مسبقًا" للتأكد من أن التوكن يعتبر منتهي
     if (raw is int) {
       return DateTime.now().subtract(const Duration(seconds: 1));
     }

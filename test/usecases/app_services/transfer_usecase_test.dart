@@ -3,7 +3,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:dartz/dartz.dart';
 
 import 'package:complaints_app/core/errors/failure.dart';
-import 'package:complaints_app/features/app_services/domain/entities/transfer_result_entity.dart';
 import 'package:complaints_app/features/app_services/domain/use_case/transfer_use_case.dart';
 
 import '../../helpers/fixtures.dart';

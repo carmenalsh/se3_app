@@ -44,9 +44,8 @@ class CustomAppBar extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                   color: AppColor.textColor,
                 ),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+               onPressed: onPressed ?? () => Navigator.pop(context),
+
               ),
             ),
           ],

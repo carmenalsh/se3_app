@@ -22,10 +22,6 @@ class CreateAccountPage extends StatelessWidget {
     return BlocListener<CreateAccountCubit, CreateAccountState>(
       listenWhen: (p, c) => p.message != c.message && c.message != null,
       listener: (context, state) {
-        // ScaffoldMessenger.of(
-        //   context,
-        // ).showSnackBar(SnackBar(content: Text(state.message!)));
-
         if (state.status == CreateAccountStatus.error) {
           showTopSnackBar(
             context,

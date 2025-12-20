@@ -44,7 +44,7 @@ class WelcomeViewBody extends StatelessWidget {
                   style: const TextStyle(fontWeight: FontWeight.bold),
                   children: [
                     TextSpan(
-                      text: "ن",
+                      text: "ت",
                       style: TextStyle(
                         color: AppColor.primary,
                         fontFamily: AppFonts.tasees,
@@ -52,7 +52,7 @@ class WelcomeViewBody extends StatelessWidget {
                       ),
                     ),
                     TextSpan(
-                      text: "قد",
+                      text: "واصل",
                       style: TextStyle(
                         color: AppColor.black,
                         fontFamily: AppFonts.tasees,

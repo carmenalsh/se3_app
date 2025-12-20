@@ -87,7 +87,7 @@ class HomeViewBody extends StatelessWidget {
                   ),
                 );
               }
-              final transActions = state.transActions;
+              //final transActions = state.transActions;
               final items = state.transActions
                   .map(TransactionToFeedAdapter.adapt)
                   .toList();
@@ -96,7 +96,6 @@ class HomeViewBody extends StatelessWidget {
                   horizontal: 16,
                   vertical: 16,
                 ),
-                // itemCount: transActions.length + (state.canLoadMore ? 1 : 0),
                 itemCount: items.length + (state.canLoadMore ? 1 : 0),
                 separatorBuilder: (_, _) =>
                     SizedBox(height: SizeConfig.height * .005),
@@ -115,11 +114,8 @@ class HomeViewBody extends StatelessWidget {
                           childHorizontalPad: 12,
                           child: state.isLoadingMore
                               ? const SizedBox(
-                                  // height: 20,
-                                  // width: 20,
                                   child: CircularProgressIndicator(
                                     padding: EdgeInsets.symmetric(
-                                      //vertical: 10,
                                       horizontal: 20,
                                     ),
                                     strokeWidth: 2,
@@ -135,7 +131,7 @@ class HomeViewBody extends StatelessWidget {
                       ),
                     );
                   }
-                  final transAction = transActions[index];
+                 // final transAction = transActions[index];
                   final item = items[index];
                   final statusText = item.typeText ?? '';
                   final statusColor = typeTransActionColor(statusText);
@@ -147,19 +143,6 @@ class HomeViewBody extends StatelessWidget {
                     onTap: () {},
                     child: CardDetaisWidget(
                       onTapEditAccount: () {},
-                      // title: transAction.name,
-                      // status: statusText,
-                      // numberAccount:
-                      //     statusText == "سحب" || statusText == "تحويل"
-                      //     ? transAction.fromAccountNumber!
-                      //     : transAction.toAccountNumber!,
-                      // statusColor: statusColor,
-                      // toAccount: statusText == "تحويل"
-                      //     ? transAction.toAccountNumber
-                      //     : null,
-                      // fontSize: SizeConfig.diagonal * .024,
-                      // amount: transAction.amount,
-                      // date: transAction.executedAt,
                       title: item.title,
                       status: statusText,
                       numberAccount: numberAccount,

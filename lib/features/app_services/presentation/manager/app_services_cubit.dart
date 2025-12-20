@@ -145,34 +145,6 @@ class AppServicesCubit extends Cubit<AppServicesState> {
     final amount = state.amountChanged.trim();
     final name = state.operationNameChanged.trim();
 
-    // final fromAccountId = state.selectedFromAccountId;
-    // final selectedOperationType = state.selectedOperationType;
-    // final selectedDate = state.sectectDate;
-    // final amount = state.amountChanged.trim();
-    // final name = state.operationNameChanged.trim();
-    // if (fromAccountId == null) {
-    //   emit(state.copyWith(message: 'اختر الحساب', clearMessage: false));
-    //   return;
-    // }
-    // if (name.isEmpty) {
-    //   emit(state.copyWith(message: 'اكتب عنوان العملية', clearMessage: false));
-    //   return;
-    // }
-    // if (amount.isEmpty) {
-    //   emit(state.copyWith(message: 'ادخل المبلغ', clearMessage: false));
-    //   return;
-    // }
-    // if (selectedOperationType == null) {
-    //   emit(state.copyWith(message: 'اختر نوع العملية', clearMessage: false));
-    //   return;
-    // }
-    // if (selectedDate == null) {
-    //   emit(
-    //     state.copyWith(message: 'الرجاء تحديد التاريخ', clearMessage: false),
-    //   );
-    //   return;
-    // }
-
     emit(
       state.copyWith(
         isSubmitting: true,

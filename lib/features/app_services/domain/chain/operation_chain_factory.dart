@@ -9,19 +9,19 @@ import 'handlers/require_scheduled_fields_handler.dart';
 
 class OperationChainFactory {
   static OperationHandler buildFor(OperationType type) {
-    // base chain: account -> name -> amount
+    //base chain: account-> name-> amount
     final head = RequireAccountHandler();
     OperationHandler tail = head;
 
     tail = tail.setNext(RequireNameHandler());
     tail = tail.setNext(RequireAmountHandler());
 
-    // transfer: add to-account check
+    //transfer: add to-account check
     if (type == OperationType.transfer) {
       tail = tail.setNext(RequireToAccountHandler());
     }
 
-    // scheduled: add scheduled fields check
+    //scheduled: add scheduled fields check
     if (type == OperationType.scheduled) {
       tail = tail.setNext(RequireScheduledFieldsHandler());
     }
